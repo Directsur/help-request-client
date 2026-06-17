@@ -1,0 +1,92 @@
+# Copyright (C) 2025-2026 Direct Sevilla Global Services SL
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Se ejecuta al publicar un release en GitHub.
+# Compila los tres paquetes (Windows, Linux, macOS) y los adjunta al release.
+
+name: Build & Release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+
+  # ── Windows → .exe ─────────────────────────────────────────────────────────
+  build-windows:
+    name: Windows (.exe)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias
+        run: |
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Compilar
+        run: python build.py
+
+      - name: Adjuntar al release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/SolicitudAyuda.exe
+
+  # ── Linux → AppImage ───────────────────────────────────────────────────────
+  build-linux:
+    name: Linux (AppImage)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias del sistema
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y python3-tk libfuse2
+
+      - name: Instalar dependencias Python
+        run: |
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Compilar AppImage
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: "1"
+        run: bash build_linux.sh
+
+      - name: Adjuntar al release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: SolicitudAyuda-x86_64.AppImage
+
+  # ── macOS → .dmg ───────────────────────────────────────────────────────────
+  build-macos:
+    name: macOS (.dmg)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias Python
+        run: |
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Compilar .dmg
+        run: bash build_macos.sh
+
+      - name: Adjuntar al release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/SolicitudAyuda.dmg
