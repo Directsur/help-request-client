@@ -53,10 +53,15 @@ O haga doble clic en el archivo desde el gestor de archivos.
 ## Primer inicio
 
 1. Aparece la **ventana de información del atajo de teclado**.
-2. A continuación la **ventana de configuración de ubicación**. Los campos funcionan en
-   **cascada**: seleccione primero el centro y cada selector siguiente se activará mostrando
-   solo los elementos que le corresponden. Si algún elemento no aparece, pulse **[+]**
-   para añadirlo. Los cuatro campos son obligatorios.
+2. A continuación la **ventana de configuración de ubicación**:
+   - **Servidor** — si el servidor está en el mismo segmento de red que este equipo, se
+     detecta automáticamente y el campo puede quedarse vacío. Si el servidor está en un
+     segmento diferente (por ejemplo, en un CPD), introduzca su URL completa:
+     `http://192.168.10.50:8080` y pulse **Conectar**.
+   - Los campos de ubicación funcionan en **cascada**: seleccione primero el centro y cada
+     selector siguiente se activará mostrando solo los elementos que le corresponden. Si
+     algún elemento no aparece, pulse **[+]** para añadirlo.
+   - Los cuatro campos de ubicación son obligatorios.
 3. Pulse **Confirmar ubicación**. El icono aparece en la bandeja del sistema.
 
 La aplicación se configura automáticamente para **arrancar con la sesión de escritorio**

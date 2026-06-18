@@ -53,11 +53,16 @@ Al arrancar por primera vez:
 
 1. Aparece la **ventana de información del atajo de teclado** con la combinación de teclas
    configurada para enviar alertas (por defecto **Ctrl + F12**).
-2. A continuación aparece la **ventana de configuración de ubicación**. Los cuatro campos
-   (centro, edificio, planta y sala) funcionan en **cascada**: seleccione primero el centro
-   y cada selector siguiente se activará mostrando solo los elementos que le corresponden.
-   Si algún elemento no aparece en la lista, pulse **[+]** junto al campo para añadirlo.
-   Los cuatro campos son obligatorios antes de poder pulsar «Confirmar ubicación».
+2. A continuación aparece la **ventana de configuración de ubicación**:
+   - **Servidor** — si el servidor está en el mismo segmento de red que este equipo, se
+     detecta automáticamente y el campo puede quedarse vacío. Si el servidor está en un
+     segmento diferente (por ejemplo, en un CPD), introduzca su URL completa:
+     `http://192.168.10.50:8080` y pulse **Conectar**.
+   - Los campos de ubicación (centro, edificio, planta y sala) funcionan en **cascada**:
+     seleccione primero el centro y cada selector siguiente se activará mostrando solo los
+     elementos que le corresponden. Si algún elemento no aparece en la lista, pulse **[+]**
+     junto al campo para añadirlo.
+   - Los cuatro campos de ubicación son obligatorios antes de poder pulsar «Confirmar ubicación».
 3. Pulse **Confirmar ubicación**. La aplicación queda activa en la bandeja del sistema
    (junto al reloj, en la esquina inferior derecha).
 
