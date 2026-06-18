@@ -16,6 +16,9 @@ on:
         required: true
         default: 'v1.1.1'
 
+permissions:
+  contents: write
+
 jobs:
 
   # ── Windows → .exe ─────────────────────────────────────────────────────────
