@@ -20,6 +20,7 @@ Este repositorio contiene el **cliente de escritorio** multiplataforma. El servi
 - **Modo simulacro** (`Ctrl+Mayúsculas+F12`) para verificar que el sistema funciona sin generar alertas reales
 - **Icono en la bandeja del sistema** con indicador de estado en color (verde / amarillo / rojo / gris)
 - **Configuración de ubicación en cascada** — selects dependientes Centro → Edificio → Planta → Sala con posibilidad de añadir nuevos elementos desde el propio cliente
+- **URL de servidor manual** — para redes multi-segmento donde el servidor está en un CPD o segmento diferente al que el broadcast UDP no llega
 - **Atajo configurable desde el servidor** — se distribuye automáticamente a todos los clientes al arrancar
 - **Autoarranque con el sistema operativo** sin intervención del usuario
 - **Soporte Wayland** en Linux — registra atajos en GNOME y KDE automáticamente
@@ -45,9 +46,10 @@ Este repositorio contiene el **cliente de escritorio** multiplataforma. El servi
 1. Descargue el paquete para su plataforma (`.exe`, `.AppImage` o `.dmg`).
 2. Ejecute la aplicación. Aparecerá la **ventana de información** con el atajo de teclado activo.
 3. A continuación, la **ventana de configuración de ubicación**:
+   - **Servidor** — si el servidor está en el mismo segmento de red, se detecta automáticamente (campo vacío). Si está en un segmento distinto (CPD, VLAN separada), introduzca la URL completa, p. ej. `http://192.168.10.50:8080`, y pulse **Conectar**.
    - Seleccione Centro → Edificio → Planta → Sala (selects en cascada).
    - Si algún elemento no está en la lista, pulse **[+]** para añadirlo al servidor.
-   - Los cuatro campos son obligatorios para poder enviar alertas.
+   - Los cuatro campos de ubicación son obligatorios para poder enviar alertas.
 4. Pulse **Confirmar ubicación**. El icono queda en la bandeja del sistema.
 5. A partir de ese momento, pulse `Ctrl+F12` para enviar una alerta.
 
