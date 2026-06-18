@@ -66,18 +66,30 @@ Solo se conservan los últimos 5 registros de simulacro en el servidor.\
 
     ("Configurar la ubicación", """\
 La primera vez que abre la aplicación aparece la ventana de configuración.
-Los campos funcionan en cascada: cada selector depende del anterior.
+
+Servidor
+  En la parte superior hay un campo «Servidor». Si el servidor está en el
+  mismo segmento de red, se detecta automáticamente y puede dejarlo vacío.
+  Si está en un segmento distinto (por ejemplo, un CPD al que se llega a
+  través del router), introduzca la URL completa y pulse Conectar:
+
+    Ejemplo:  http://192.168.10.50:8080
+
+  La URL se guarda y se usa en todos los arranques posteriores.
+
+Ubicación
+  Los campos funcionan en cascada: cada selector depende del anterior.
 
   1. Elija el Centro.
   2. Se activa Edificio → muestra solo los edificios de ese centro.
   3. Se activa Planta → muestra solo las plantas de ese edificio.
   4. Se activa Sala → muestra solo las salas de esa planta.
 
-Si un elemento no aparece en la lista, pulse [+] a la derecha del campo
-para añadirlo. El nuevo elemento queda disponible de inmediato.
+  Si un elemento no aparece en la lista, pulse [+] a la derecha del campo
+  para añadirlo. El nuevo elemento queda disponible de inmediato.
 
-Los cuatro campos son obligatorios para poder enviar alertas.
-El botón «Confirmar ubicación» no se completa hasta que todos estén rellenos.
+  Los cuatro campos son obligatorios para poder enviar alertas.
+  El botón «Confirmar ubicación» no se activa hasta que todos estén rellenos.
 
 Para omitir por ahora: cierre la ventana con la X y confirme el aviso.
 El equipo arrancará en modo solo-recepción (icono amarillo o gris).
@@ -113,6 +125,12 @@ El icono está gris, ¿qué hago?
   Compruebe la conexión de red. Abra «Configurar ubicación...» y verifique
   que los datos son correctos. Si el servidor no responde, contacte con el
   administrador.
+
+El cliente no encuentra el servidor (icono rojo o gris persistente).
+  Si el servidor está en un segmento de red diferente al de este equipo,
+  el descubrimiento automático por UDP no funcionará. Abra «Configurar
+  ubicación...», introduzca la URL del servidor en el campo Servidor
+  (p. ej. http://192.168.10.50:8080) y pulse Conectar.
 
 ¿Funciona sin conexión a internet?
   Sí. El sistema funciona completamente en la red local del centro.
