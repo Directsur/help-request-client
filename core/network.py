@@ -12,6 +12,8 @@ _SESSION.timeout = 5
 
 
 def _api(server_ip: str) -> str:
+    if server_ip.startswith("http://") or server_ip.startswith("https://"):
+        return server_ip.rstrip("/")
     return f"http://{server_ip}:{cfg.API_PORT}"
 
 

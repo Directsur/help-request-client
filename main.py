@@ -68,9 +68,13 @@ def _heartbeat_loop():
 
         # Reintenta descubrir servidor si no hay
         if not _app_cfg.get("server_ip"):
-            found = network.discover_server(timeout=2)
-            if found:
-                _on_server_found(found)
+            manual_url = _app_cfg.get("server_url", "")
+            if manual_url:
+                _on_server_found(manual_url)
+            else:
+                found = network.discover_server(timeout=2)
+                if found:
+                    _on_server_found(found)
 
 
 def _update_tray_status():
@@ -145,7 +149,13 @@ def _open_setup():
 
     def on_confirm(updates: dict):
         global _send_enabled
+        new_server_url = updates.pop("server_url", None)
         _app_cfg.update(updates)
+        if new_server_url is not None:
+            _app_cfg["server_url"] = new_server_url
+            # Si la URL manual cambió, descartamos el server_ip actual para reconectar
+            if new_server_url != _app_cfg.get("server_ip", ""):
+                _app_cfg["server_ip"] = new_server_url if new_server_url else None
         cfg.save(_app_cfg)
         _send_enabled = cfg.is_location_complete(_app_cfg)
         _update_tray_status()
@@ -271,7 +281,8 @@ def main():
 
     # Descubrimiento inicial del servidor en un thread para no bloquear la UI
     def init_server():
-        server_ip = network.discover_server(timeout=3)
+        manual_url = _app_cfg.get("server_url", "")
+        server_ip = manual_url or network.discover_server(timeout=3)
         if server_ip:
             _on_server_found(server_ip)
 

@@ -27,6 +27,7 @@ DEFAULT_HOTKEY_DISPLAY = "Ctrl+F12"
 _DEFAULTS = {
     "client_id":      socket.gethostname(),
     "server_ip":      None,
+    "server_url":     "",   # URL manual (vacío = descubrimiento automático por UDP)
     "room_id":        None,
     "room":           "",
     "floor":          "",

@@ -13,7 +13,8 @@ class SetupWindow:
         self.cfg        = app_cfg
         self.on_confirm = on_confirm
         self.on_skip    = on_skip
-        self.server_ip  = app_cfg.get("server_ip")
+        # Usa la URL manual si está configurada; si no, el IP descubierto por UDP
+        self.server_ip  = app_cfg.get("server_url") or app_cfg.get("server_ip")
 
         self.root = tk.Tk()
         self.root.title("Configuración de ubicación — Solicitudes de Ayuda")
@@ -29,7 +30,7 @@ class SetupWindow:
         self._build_ui()
         self._load_centers()
 
-        w, h = 520, 400
+        w, h = 520, 450
         sw = self.root.winfo_screenwidth()
         sh = self.root.winfo_screenheight()
         self.root.geometry(f"{w}x{h}+{(sw-w)//2}+{(sh-h)//2}")
@@ -46,6 +47,29 @@ class SetupWindow:
         tk.Label(self.root,
                  text="Confirma o corrige la ubicación de este equipo:",
                  font=font(10)).pack(pady=(0, 10))
+
+        # ── URL manual del servidor ──
+        url_frame = tk.Frame(self.root, bg="#1a252f", pady=5)
+        url_frame.pack(fill="x", padx=24, pady=(0, 8))
+        url_frame.columnconfigure(1, weight=1)
+        tk.Label(url_frame, text="Servidor:", anchor="w", width=10,
+                 bg="#1a252f", fg="#aed6f1", font=font(9)).grid(
+            row=0, column=0, padx=(8, 6), sticky="w")
+        self.server_url_var = tk.StringVar(value=self.cfg.get("server_url", ""))
+        self.server_url_entry = tk.Entry(url_frame, textvariable=self.server_url_var,
+                                          width=28, font=font(9), bg="#253444", fg="white",
+                                          insertbackground="white",
+                                          relief="flat")
+        self.server_url_entry.grid(row=0, column=1, padx=(0, 6), sticky="ew", ipady=3)
+        tk.Button(url_frame, text="Conectar", font=font(9),
+                  relief="flat", bg="#2980b9", fg="white",
+                  activebackground="#1a6ea8", cursor="hand2",
+                  command=self._connect_manual_url).grid(row=0, column=2, padx=(0, 8))
+        auto_status = "Detectado automáticamente" if self.cfg.get("server_ip") and not self.cfg.get("server_url") else \
+                      ("" if self.server_ip else "Sin servidor detectado")
+        self._url_status = tk.Label(url_frame, text=auto_status,
+                                     bg="#1a252f", fg="#7fb3d3", font=font(8))
+        self._url_status.grid(row=1, column=0, columnspan=3, padx=8, sticky="w")
 
         # Grid de selects
         frame = tk.Frame(self.root)
@@ -130,11 +154,6 @@ class SetupWindow:
                  font=mono(12, "bold"), bg="#f39c12", fg="#1a252f",
                  padx=8, pady=2).pack(side="left")
 
-        # ── Aviso sin servidor ──
-        if not self.server_ip:
-            tk.Label(self.root,
-                     text="⚠  Sin conexión al servidor — los selects solo muestran los datos guardados",
-                     fg="#e67e22", font=font(9)).pack(pady=(6, 0))
 
         # ── Botón confirmar ──
         self.confirm_btn = tk.Button(
@@ -156,6 +175,27 @@ class SetupWindow:
         """Habilita o deshabilita un combobox y su botón [+] en bloque."""
         cb.config(state="readonly" if enabled else "disabled")
         btn.config(state="normal" if enabled else "disabled")
+
+    def _connect_manual_url(self):
+        url = self.server_url_var.get().strip()
+        if url and not (url.startswith("http://") or url.startswith("https://")):
+            url = "http://" + url
+            self.server_url_var.set(url)
+        self.server_ip = url or None
+        self._centers = []
+        self._url_status.config(
+            text="Conectando..." if url else "Descubrimiento automático por red local",
+            fg="#f39c12"
+        )
+        self.root.update_idletasks()
+        self._load_centers()
+        if url:
+            if self._centers:
+                self._url_status.config(text="Conectado", fg="#27ae60")
+            else:
+                self._url_status.config(text="No se pudo conectar. Comprueba la URL.", fg="#e74c3c")
+        else:
+            self._url_status.config(text="Usando descubrimiento automático", fg="#7fb3d3")
 
     def _reset_downstream(self, from_level: str):
         """Limpia y deshabilita todos los niveles por debajo del indicado."""
@@ -423,6 +463,7 @@ class SetupWindow:
             "building":    building_name,
             "center":      center_name,
             "is_security": self.security_var.get(),
+            "server_url":  self.server_url_var.get().strip(),
         }
 
         if self.server_ip and room:

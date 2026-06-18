@@ -75,8 +75,25 @@ Solo se conservan los últimos 5 registros de simulacro.
 ## Configurar su ubicación
 
 La primera vez que inicia la aplicación aparece la ventana de configuración de ubicación.
-Los campos forman una **jerarquía en cascada**: cada selector solo muestra los elementos
-que pertenecen a la selección anterior.
+
+### Servidor
+
+En la parte superior de la ventana aparece el campo **Servidor**. Normalmente el cliente
+detecta el servidor de forma automática por la red local y no es necesario rellenar este
+campo. Sin embargo, si el servidor se encuentra en un segmento de red diferente (por
+ejemplo, en un CPD al que se llega a través de la puerta de enlace), la detección
+automática no funciona. En ese caso:
+
+1. Introduzca la URL completa del servidor: `http://192.168.10.50:8080`
+2. Pulse **Conectar** para verificar la conexión y cargar la lista de ubicaciones.
+
+Si el campo queda vacío, el cliente intentará detectar el servidor automáticamente
+mediante difusión UDP en la red local.
+
+### Ubicación
+
+Los campos de ubicación forman una **jerarquía en cascada**: cada selector solo muestra
+los elementos que pertenecen a la selección anterior.
 
 1. Elija el **Centro** en el primer desplegable.
 2. Una vez seleccionado el centro, el desplegable **Edificio** se activa y muestra solo
@@ -127,6 +144,13 @@ histórico en el servidor mientras dura la caída.
 Si la red tiene VLANs que separan los equipos, el sistema usa la lista de equipos conocidos
 para enviar las alertas de forma individual. El administrador de red debe asegurarse de que
 el puerto UDP 54321 y el puerto TCP 8080 estén permitidos entre las VLANs.
+
+**El servidor está en otro segmento de red (CPD) y el cliente no lo encuentra.**
+La detección automática por UDP solo funciona dentro del mismo segmento de red. Si el
+servidor está en una red diferente a la que llega a través del router, introduzca la URL
+completa del servidor en el campo **Servidor** de la ventana de configuración y pulse
+**Conectar** (p. ej. `http://192.168.10.50:8080`). La dirección queda guardada y se usa
+en todos los arranques posteriores.
 
 **¿Qué pasa si pulso el atajo por error?**
 La alerta se envía inmediatamente. No hay confirmación previa por diseño (para no perder
