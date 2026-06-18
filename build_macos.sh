@@ -77,6 +77,7 @@ info "Compilando con PyInstaller..."
 # Requiere que todas las dependencias tengan ruedas universal2 disponibles.
 # La arquitectura nativa (x86_64 en Intel, arm64 en M1/M2) es suficiente para distribución.
 
+# --osx-info-plist fue eliminado en PyInstaller v6; se parchea el plist tras el build
 .venv/bin/pyinstaller \
     --noconfirm \
     --clean \
@@ -85,7 +86,6 @@ info "Compilando con PyInstaller..."
     --noconsole \
     --onedir \
     --osx-bundle-identifier "$BUNDLE_ID" \
-    --osx-info-plist macos_info.plist \
     --icon SolicitudAyuda.icns \
     --hidden-import "pynput.keyboard._darwin" \
     --hidden-import "pynput.mouse._darwin" \
@@ -97,6 +97,33 @@ info "Compilando con PyInstaller..."
 
 [[ -d "$APP_PATH" ]] || error "PyInstaller no generó el bundle .app"
 info "Bundle creado: $APP_PATH"
+
+# ─── 4b. Parchar Info.plist ────────────────────────────────────────────────────
+# Añade las claves de nuestro plist personalizado sobre el generado por PyInstaller
+info "Parchando Info.plist..."
+python3 - <<PYEOF
+import plistlib, sys
+path = "$APP_PATH/Contents/Info.plist"
+try:
+    with open(path, 'rb') as f:
+        plist = plistlib.load(f)
+except Exception:
+    plist = {}
+plist.update({
+    'LSUIElement': True,
+    'NSAccessibilityUsageDescription':
+        'Esta aplicación necesita permiso de Accesibilidad para detectar '
+        'el atajo de teclado de solicitud de ayuda cuando otras ventanas '
+        'están en primer plano.',
+    'LSMinimumSystemVersion': '11.0',
+    'CFBundleDisplayName': 'Solicitud de Ayuda',
+    'CFBundleShortVersionString': '1.0.0',
+    'NSHighResolutionCapable': True,
+})
+with open(path, 'wb') as f:
+    plistlib.dump(plist, f)
+print("Info.plist actualizado.")
+PYEOF
 
 # ─── 5. Permisos del ejecutable ────────────────────────────────────────────────
 # Asegura que el binario dentro del bundle sea ejecutable

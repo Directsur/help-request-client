@@ -24,8 +24,7 @@ args = [
 ]
 
 if SYSTEM == "Windows":
-    # Sin consola en Windows, arranque silencioso
-    args += ["--win-private-assemblies"]
+    pass  # --win-private-assemblies eliminado en PyInstaller v6
 
 elif SYSTEM == "Darwin":
     args += [
