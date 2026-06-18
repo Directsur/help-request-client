@@ -35,7 +35,7 @@ Pase el cursor sobre el icono para ver el atajo activo y el estado de conexión.
     ("Enviar una alerta de ayuda", """\
 1. Pulse el atajo de teclado configurado (por defecto Ctrl + F12).
 2. La alerta se envía inmediatamente a todos los equipos del mismo grupo
-   y a los equipos de seguridad del centro.
+   y a los equipos de seguridad adscritos al mismo centro.
 3. El mensaje incluye su nombre, el nombre del equipo y la ubicación completa.
 
 El atajo funciona aunque la ventana esté cerrada o haya otras aplicaciones en

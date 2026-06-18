@@ -35,7 +35,7 @@ activo y el estado de la conexión.
 
 1. Pulse el **atajo de teclado configurado** (por defecto **Ctrl + F12**).
 2. La alerta se envía de forma inmediata a todos los equipos de su grupo y a los equipos de
-   seguridad del centro.
+   seguridad adscritos al mismo centro.
 3. El mensaje incluye su nombre de usuario, el nombre del equipo y la ubicación exacta
    (sala, planta, edificio y centro).
 
