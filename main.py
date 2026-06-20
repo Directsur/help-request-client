@@ -15,7 +15,7 @@ import config as cfg
 from core import alert, network
 from platform_support import hotkey
 DRILL_HOTKEY = "<ctrl>+<shift>+<f12>"
-from platform_support import autostart, trigger_socket, wayland_shortcuts
+from platform_support import autostart, trigger_socket, updater, wayland_shortcuts
 from ui import alert_popup, help_window, hotkey_info, setup_window, tray
 
 # Estado global de la aplicación
@@ -266,7 +266,9 @@ def main():
         return
 
     _app_cfg = cfg.load()
+    updater.install_to_stable_location()
     autostart.enable()
+    updater.schedule_update_check()
 
     alert.set_alert_callback(alert_popup.show)
 

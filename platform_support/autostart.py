@@ -61,9 +61,10 @@ def _disable_windows():
 
 # ─── Linux ─────────────────────────────────────────────────────────────────────
 
-_LINUX_DESKTOP = os.path.join(
-    os.path.expanduser("~"), ".config", "autostart", "help-request.desktop"
-)
+_LINUX_INSTALL  = os.path.expanduser("~/.local/bin/SolicitudAyuda")
+_LINUX_DESKTOP  = os.path.expanduser("~/.config/autostart/help-request.desktop")
+_OPENBOX_AUTO   = os.path.expanduser("~/.config/openbox/autostart")
+_OPENBOX_MARKER = "# SolicitudAyuda"
 
 _DESKTOP_CONTENT = """\
 [Desktop Entry]
@@ -77,10 +78,31 @@ X-GNOME-Autostart-enabled=true
 """
 
 
+def _linux_exec() -> str:
+    """En AppImages usamos la ruta de instalación fija para que autostart
+    sobreviva a actualizaciones y a mover el AppImage original."""
+    if getattr(sys, "frozen", False):
+        return _LINUX_INSTALL
+    return _executable_path()
+
+
 def _enable_linux():
+    exe = _linux_exec()
+
+    # XDG autostart (.desktop) — funciona con GNOME, KDE, XFCE, lxsession…
     os.makedirs(os.path.dirname(_LINUX_DESKTOP), exist_ok=True)
     with open(_LINUX_DESKTOP, "w") as f:
-        f.write(_DESKTOP_CONTENT.format(exec=_executable_path()))
+        f.write(_DESKTOP_CONTENT.format(exec=exe))
+
+    # Openbox autostart — para sesiones sin gestor de sesión XDG
+    if os.path.isfile(_OPENBOX_AUTO):
+        content = open(_OPENBOX_AUTO).read()
+        if _OPENBOX_MARKER not in content:
+            with open(_OPENBOX_AUTO, "a") as f:
+                f.write(f"\n{_OPENBOX_MARKER}\n{exe} &\n")
+    elif os.path.isdir(os.path.dirname(_OPENBOX_AUTO)):
+        with open(_OPENBOX_AUTO, "w") as f:
+            f.write(f"{_OPENBOX_MARKER}\n{exe} &\n")
 
 
 def _disable_linux():
@@ -88,6 +110,13 @@ def _disable_linux():
         os.remove(_LINUX_DESKTOP)
     except FileNotFoundError:
         pass
+
+    if os.path.isfile(_OPENBOX_AUTO):
+        lines = open(_OPENBOX_AUTO).readlines()
+        filtered = [l for l in lines
+                    if _OPENBOX_MARKER not in l and _LINUX_INSTALL not in l]
+        with open(_OPENBOX_AUTO, "w") as f:
+            f.writelines(filtered)
 
 
 # ─── macOS ─────────────────────────────────────────────────────────────────────

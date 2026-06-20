@@ -70,6 +70,7 @@ jobs:
       - name: Compilar AppImage
         env:
           APPIMAGE_EXTRACT_AND_RUN: "1"
+          APP_VERSION: ${{ github.event.release.tag_name || inputs.tag }}
         run: bash build_linux.sh
 
       - name: Adjuntar al release

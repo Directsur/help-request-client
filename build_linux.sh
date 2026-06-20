@@ -32,6 +32,9 @@ python3 -m venv .venv
 .venv/bin/pip install --quiet -r requirements.txt
 
 # ─── 3. PyInstaller → binario ─────────────────────────────────────────────────
+info "Grabando versión: ${APP_VERSION:-dev}"
+echo "${APP_VERSION:-dev}" > version.txt
+
 info "Compilando con PyInstaller..."
 .venv/bin/pyinstaller \
     --noconfirm \
@@ -43,6 +46,7 @@ info "Compilando con PyInstaller..."
     --hidden-import "pynput.mouse._xorg" \
     --hidden-import "PIL._tkinter_finder" \
     --add-data "ui/tray_gtk_helper.py:." \
+    --add-data "version.txt:." \
     main.py
 
 [[ -f "dist/$APP_NAME" ]] || error "PyInstaller no generó el binario"
