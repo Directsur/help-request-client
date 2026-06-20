@@ -55,7 +55,12 @@ class SetupWindow:
         tk.Label(url_frame, text="Servidor:", anchor="w", width=10,
                  bg="#1a252f", fg="#aed6f1", font=font(9)).grid(
             row=0, column=0, padx=(8, 6), sticky="w")
-        self.server_url_var = tk.StringVar(value=self.cfg.get("server_url", ""))
+        # Si el servidor se detectó por UDP sin URL manual, mostrar la URL completa
+        _discovered_ip = self.cfg.get("server_ip") if not self.cfg.get("server_url") else None
+        initial_url = self.cfg.get("server_url", "") or (
+            f"http://{_discovered_ip}:{cfg.API_PORT}" if _discovered_ip else ""
+        )
+        self.server_url_var = tk.StringVar(value=initial_url)
         self.server_url_entry = tk.Entry(url_frame, textvariable=self.server_url_var,
                                           width=28, font=font(9), bg="#253444", fg="white",
                                           insertbackground="white",
@@ -65,10 +70,14 @@ class SetupWindow:
                   relief="flat", bg="#2980b9", fg="white",
                   activebackground="#1a6ea8", cursor="hand2",
                   command=self._connect_manual_url).grid(row=0, column=2, padx=(0, 8))
-        auto_status = "Detectado automáticamente" if self.cfg.get("server_ip") and not self.cfg.get("server_url") else \
-                      ("" if self.server_ip else "Sin servidor detectado")
+        if self.server_ip:
+            auto_status = ("Detectado automáticamente" if _discovered_ip else "")
+            status_color = "#27ae60"
+        else:
+            auto_status = "Sin servidor detectado — introduce la URL y pulsa Conectar"
+            status_color = "#e74c3c"
         self._url_status = tk.Label(url_frame, text=auto_status,
-                                     bg="#1a252f", fg="#7fb3d3", font=font(8))
+                                     bg="#1a252f", fg=status_color, font=font(8))
         self._url_status.grid(row=1, column=0, columnspan=3, padx=8, sticky="w")
 
         # Grid de selects
