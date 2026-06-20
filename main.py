@@ -8,6 +8,7 @@ import json
 import os
 import platform
 import socket
+import sys
 import threading
 import time
 
@@ -248,7 +249,6 @@ def _handle_trigger_args() -> bool:
     Si el proceso fue invocado con --trigger o --drill, reenvía el comando
     a la instancia en ejecución y termina. Devuelve True si hay que salir.
     """
-    import sys
     args = sys.argv[1:]
     if "--trigger" in args:
         trigger_socket.send_trigger(trigger_socket.TRIGGER_ALERT)
@@ -261,6 +261,11 @@ def _handle_trigger_args() -> bool:
 
 def main():
     global _app_cfg, _tray, _send_enabled
+
+    if "--uninstall" in sys.argv[1:]:
+        from platform_support.uninstaller import run as _uninstall
+        _uninstall()
+        return
 
     updater.apply_pending_update()  # Windows: aplica update descargado y relanza
 

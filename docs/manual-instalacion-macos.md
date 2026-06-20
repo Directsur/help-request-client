@@ -105,17 +105,24 @@ Para desactivar el arranque automático:
 
 ## Desinstalación
 
+La forma más sencilla es usar el desinstalador integrado:
+
 1. Cierre la aplicación: clic en el icono de la barra de menús → **Salir**.
-2. Elimine la aplicación:
+2. Abra el Terminal y ejecute:
    ```bash
-   rm -rf /Applications/SolicitudAyuda.app
+   /Applications/SolicitudAyuda.app/Contents/MacOS/SolicitudAyuda --uninstall
    ```
-3. Elimine los archivos de configuración y arranque automático:
-   ```bash
-   rm -rf ~/.config/HelpRequest/
-   launchctl unload ~/Library/LaunchAgents/es.centrosalud.solicitudayuda.plist
-   rm ~/Library/LaunchAgents/es.centrosalud.solicitudayuda.plist
-   ```
+3. Confirme en la ventana que aparece. El desinstalador eliminará el bundle `.app`,
+   el LaunchAgent de autoarranque y la configuración del usuario actual.
+
+### Desinstalación manual
+
+```bash
+rm -rf /Applications/SolicitudAyuda.app
+launchctl unload ~/Library/LaunchAgents/es.centrosalud.solicitudayuda.plist
+rm ~/Library/LaunchAgents/es.centrosalud.solicitudayuda.plist
+rm -rf ~/.config/HelpRequest/
+```
 
 ---
 

@@ -135,12 +135,34 @@ para configurar el atajo manualmente. El comando a asociar es:
 
 ## Desinstalación
 
+La forma más sencilla es usar el desinstalador integrado. Cierre primero la aplicación
+(clic derecho en el icono → **Salir**) y luego ejecute:
+
+```bash
+SolicitudAyuda --uninstall
+```
+
+Aparecerá una ventana de confirmación. Al aceptar, se eliminarán el ejecutable,
+el autoarranque y la configuración del usuario actual.
+
+> **Instalación del sistema** (`/usr/local/bin/`): el desinstalador necesita permisos
+> de administrador para borrar el ejecutable. Ejecútelo con:
+> ```bash
+> sudo SolicitudAyuda --uninstall
+> ```
+
+### Desinstalación manual
+
 ```bash
 # Detener la aplicación (clic derecho en icono → Salir)
-rm ~/.local/bin/SolicitudAyuda                            # ejecutable
-rm ~/.config/autostart/help-request.desktop              # arranque automático
-rm -rf ~/.config/HelpRequest/                            # configuración
+sudo rm /usr/local/bin/SolicitudAyuda   # instalación del sistema (si aplica)
+rm ~/.local/bin/SolicitudAyuda          # instalación de usuario (si aplica)
+rm ~/.config/autostart/help-request.desktop
+rm -rf ~/.config/HelpRequest/
 ```
+
+Para Openbox, elimine también las líneas marcadas `# SolicitudAyuda` de
+`~/.config/openbox/autostart`.
 
 ---
 

@@ -113,14 +113,27 @@ intervención del usuario.
 
 ## Desinstalación
 
+La forma más sencilla es usar el desinstalador integrado:
+
 1. Cierre la aplicación: clic derecho en el icono de la bandeja → **Salir**.
-2. Elimine el archivo `SolicitudAyuda.exe` y la carpeta donde estuviera.
-3. Elimine la entrada de arranque automático si lo desea (ver sección anterior).
-4. Los datos de configuración se guardan en:
+2. Abra una ventana de comandos (si la instalación es del sistema, ábrala como
+   **Administrador**) y ejecute:
    ```
-   C:\Users\<su usuario>\AppData\Roaming\HelpRequest\
+   SolicitudAyuda --uninstall
    ```
-   Puede eliminar esta carpeta si desea borrar completamente todos los datos del cliente.
+   O bien, si conoce la ruta completa:
+   ```
+   "C:\ProgramData\SolicitudAyuda\SolicitudAyuda.exe" --uninstall
+   ```
+3. Confirme en la ventana que aparece. El desinstalador eliminará:
+   - El ejecutable y su directorio (`C:\ProgramData\SolicitudAyuda\` o `%LOCALAPPDATA%\SolicitudAyuda\`)
+   - La entrada de arranque automático del registro de Windows
+   - Los datos de configuración del usuario actual (`%APPDATA%\HelpRequest\`)
+
+> En una instalación del sistema (`C:\ProgramData\`), cada usuario que haya
+> iniciado sesión tendrá su propia carpeta de configuración en `%APPDATA%\HelpRequest\`.
+> El desinstalador solo elimina la del usuario que lo ejecuta. Para limpiarlas todas,
+> elimine esa carpeta manualmente en cada perfil de usuario.
 
 ---
 
