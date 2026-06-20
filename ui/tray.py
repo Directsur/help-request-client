@@ -23,8 +23,10 @@ if platform.system() == "Linux":
             pass
 
 
-def _make_icon(color: str, size: int = 64) -> Image.Image:
-    # Dibujamos a 4× y reducimos con LANCZOS para obtener antialiasing
+def _make_icon(color: str, size: int = 22) -> Image.Image:
+    # Dibujamos a 4× el tamaño final y reducimos con LANCZOS para obtener
+    # antialiasing. Generamos al tamaño real del systray (22 px) para que
+    # tint2/X11 no tenga que escalar y pierda calidad.
     S = size * 4
     img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
