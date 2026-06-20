@@ -70,7 +70,6 @@ def _disable_windows():
 
 # ─── Linux ─────────────────────────────────────────────────────────────────────
 
-_LINUX_INSTALL  = os.path.expanduser("~/.local/bin/SolicitudAyuda")
 _LINUX_DESKTOP  = os.path.expanduser("~/.config/autostart/help-request.desktop")
 _OPENBOX_AUTO   = os.path.expanduser("~/.config/openbox/autostart")
 _OPENBOX_MARKER = "# SolicitudAyuda"
@@ -89,9 +88,11 @@ X-GNOME-Autostart-enabled=true
 
 def _linux_exec() -> str:
     """En AppImages usamos la ruta de instalación fija para que autostart
-    sobreviva a actualizaciones y a mover el AppImage original."""
+    sobreviva a actualizaciones y a mover el AppImage original.
+    Puede ser /usr/local/bin/ (sistema) o ~/.local/bin/ (usuario)."""
     if getattr(sys, "frozen", False):
-        return _LINUX_INSTALL
+        from platform_support.updater import get_linux_install_path
+        return get_linux_install_path()
     return _executable_path()
 
 
@@ -121,9 +122,11 @@ def _disable_linux():
         pass
 
     if os.path.isfile(_OPENBOX_AUTO):
+        from platform_support.updater import get_linux_install_path
+        install = get_linux_install_path()
         lines = open(_OPENBOX_AUTO).readlines()
         filtered = [l for l in lines
-                    if _OPENBOX_MARKER not in l and _LINUX_INSTALL not in l]
+                    if _OPENBOX_MARKER not in l and install not in l]
         with open(_OPENBOX_AUTO, "w") as f:
             f.writelines(filtered)
 

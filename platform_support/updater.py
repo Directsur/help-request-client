@@ -37,7 +37,16 @@ STARTUP_DELAY = 60   # segundos antes de comprobar actualización
 
 # ── rutas por plataforma ──────────────────────────────────────────────────────
 
-LINUX_INSTALL = os.path.expanduser("~/.local/bin/SolicitudAyuda")
+LINUX_SYSTEM_INSTALL = "/usr/local/bin/SolicitudAyuda"
+LINUX_USER_INSTALL   = os.path.expanduser("~/.local/bin/SolicitudAyuda")
+
+# Ruta resuelta tras install_to_stable_location(); usada por autostart y updater.
+_linux_resolved: str = ""
+
+
+def get_linux_install_path() -> str:
+    """Ruta donde está instalado el AppImage (resuelta tras install_to_stable_location)."""
+    return _linux_resolved or LINUX_USER_INSTALL
 
 if platform.system() == "Windows":
     _WIN_DIR     = os.path.join(
@@ -65,7 +74,14 @@ def current_version() -> str:
 # ── instalación en ruta fija ──────────────────────────────────────────────────
 
 def install_to_stable_location():
-    """Copia el ejecutable a su ruta fija si todavía no está ahí."""
+    """Copia el ejecutable a su ruta fija si todavía no está ahí.
+
+    En Linux prueba primero /usr/local/bin/ (accesible para todos los usuarios del
+    equipo). Si no hay permiso de escritura, usa ~/.local/bin/ como fallback.
+    La ruta elegida queda almacenada en _linux_resolved para que autostart y
+    el actualizador la usen.
+    """
+    global _linux_resolved
     if not getattr(sys, "frozen", False):
         return
 
@@ -73,17 +89,22 @@ def install_to_stable_location():
 
     if system == "Linux":
         src = os.path.realpath(sys.executable)
-        dst = os.path.realpath(LINUX_INSTALL)
-        if src == dst:
-            return
-        try:
-            os.makedirs(os.path.dirname(LINUX_INSTALL), exist_ok=True)
-            shutil.copy2(src, LINUX_INSTALL)
-            os.chmod(LINUX_INSTALL,
-                     os.stat(LINUX_INSTALL).st_mode
-                     | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-        except Exception:
-            pass
+
+        for candidate in (LINUX_SYSTEM_INSTALL, LINUX_USER_INSTALL):
+            if src == os.path.realpath(candidate):
+                # Ya está en una ruta fija — solo actualizamos _linux_resolved.
+                _linux_resolved = candidate
+                return
+            try:
+                os.makedirs(os.path.dirname(candidate), exist_ok=True)
+                shutil.copy2(src, candidate)
+                os.chmod(candidate,
+                         os.stat(candidate).st_mode
+                         | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+                _linux_resolved = candidate
+                return
+            except (PermissionError, OSError):
+                continue  # Sin permiso → probar siguiente candidato
 
     elif system == "Windows":
         src = os.path.realpath(sys.executable)
@@ -216,7 +237,11 @@ def _update_worker():
         return
 
     if system == "Linux":
-        ok = _download_to(asset_url, LINUX_INSTALL)
+        install_path = get_linux_install_path()
+        if install_path == LINUX_SYSTEM_INSTALL:
+            # Instalación del sistema: el administrador gestiona las actualizaciones.
+            return
+        ok = _download_to(asset_url, install_path)
         if ok:
             _notify_linux(
                 "Solicitudes de Ayuda actualizado",

@@ -42,9 +42,28 @@ O bien, en el gestor de archivos: clic derecho sobre el archivo →
 O haga doble clic en el archivo desde el gestor de archivos.
 
 > **Instalación automática:** en el primer inicio, la aplicación se copia automáticamente
-> a `~/.local/bin/SolicitudAyuda`. A partir de ese momento el autoarranque y las
-> actualizaciones automáticas usarán siempre esa ruta fija. No es necesario mover el
-> archivo manualmente.
+> a su ruta fija:
+> - `/usr/local/bin/SolicitudAyuda` si el equipo pertenece a un entorno multiusuario y el
+>   administrador ha dado permiso de escritura (o si el propio administrador ha ejecutado
+>   la aplicación por primera vez con `sudo`).
+> - `~/.local/bin/SolicitudAyuda` en caso contrario (instalación por usuario).
+>
+> El autoarranque y las actualizaciones automáticas usarán siempre esa ruta fija.
+> No es necesario mover el archivo manualmente.
+
+### Instalación compartida para todos los usuarios del equipo
+
+Si un mismo equipo tiene varios usuarios de Windows y todos deben tener acceso a la
+aplicación, el administrador puede instalarla en la ruta del sistema:
+
+```bash
+sudo install -m 755 SolicitudAyuda-x86_64.AppImage /usr/local/bin/SolicitudAyuda
+```
+
+Cada usuario deberá ejecutar la aplicación **una vez** para que se configure su propio
+autoarranque y sus ajustes de ubicación. Las actualizaciones automáticas quedan
+deshabilitadas en instalaciones del sistema; el administrador las gestiona manualmente
+ejecutando el mismo comando con la nueva versión.
 
 ---
 
@@ -68,7 +87,8 @@ La aplicación se configura automáticamente para **arrancar con la sesión de e
   en `~/.config/autostart/`.
 - **Openbox** sin gestor de sesión XDG: entrada añadida a `~/.config/openbox/autostart`.
 
-En ambos casos el ejecutable que se lanza es `~/.local/bin/SolicitudAyuda`.
+En ambos casos el ejecutable referenciado es la ruta fija donde se instaló
+(`/usr/local/bin/SolicitudAyuda` o `~/.local/bin/SolicitudAyuda`).
 
 ---
 
