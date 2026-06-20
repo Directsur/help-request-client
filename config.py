@@ -4,6 +4,7 @@ import json
 import os
 import platform
 import socket
+import uuid
 
 _SYSTEM = platform.system()
 
@@ -24,8 +25,14 @@ POPUP_TIMEOUT       = 30   # segundos antes de cerrar el popup automáticamente
 DEFAULT_HOTKEY         = "<ctrl>+<f12>"
 DEFAULT_HOTKEY_DISPLAY = "Ctrl+F12"
 
+
+def _get_mac() -> str:
+    mac = uuid.getnode()
+    return ':'.join(f'{(mac >> (i * 8)) & 0xff:02x}' for i in reversed(range(6)))
+
+
 _DEFAULTS = {
-    "client_id":      socket.gethostname(),
+    "client_id":      _get_mac(),
     "server_ip":      None,
     "server_url":     "",   # URL manual (vacío = descubrimiento automático por UDP)
     "room_id":        None,
@@ -47,10 +54,13 @@ def load() -> dict:
         try:
             with open(CONFIG_FILE, "r", encoding="utf-8") as f:
                 data = json.load(f)
-            return {**_DEFAULTS, **data}
+            cfg = {**_DEFAULTS, **data}
         except Exception:
-            pass
-    return dict(_DEFAULTS)
+            cfg = dict(_DEFAULTS)
+    else:
+        cfg = dict(_DEFAULTS)
+    cfg["client_id"] = _get_mac()
+    return cfg
 
 
 def save(cfg: dict):

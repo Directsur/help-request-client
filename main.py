@@ -103,7 +103,7 @@ def _on_server_found(server_ip: str):
 
     _fetch_hotkey(server_ip)
 
-    result = network.register(server_ip, client_id, client_id)
+    result = network.register(server_ip, client_id, socket.gethostname())
     if result:
         _app_cfg["group_id"]    = result.get("group_id")
         _app_cfg["is_security"] = result.get("is_security", False)
