@@ -27,8 +27,8 @@ class TrayHelper:
         self._icon.set_visible(True)
         self._icon.connect("activate", self._on_activate)
         self._icon.connect("popup-menu", self._on_popup_menu)
-        self._room   = "Sin ubicación"
-        self._hotkey = "Ctrl+F12"
+        self._location = "Sin ubicación"
+        self._hotkey   = "Ctrl+F12"
 
     # ── comunicación ────────────────────────────────────────────────────────
     def _send(self, data: dict):
@@ -42,8 +42,8 @@ class TrayHelper:
     def _on_popup_menu(self, icon, button, time):
         menu = Gtk.Menu()
 
-        for label in (f"📍 {self._room}",
-                      f"⌨  {self._hotkey} — solicitar ayuda"):
+        for label in (f"Ubicacion: {self._location}",
+                      f"Tecla: {self._hotkey}"):
             item = Gtk.MenuItem(label=label)
             item.set_sensitive(False)
             menu.append(item)
@@ -83,8 +83,8 @@ class TrayHelper:
         elif t == "set_tooltip":
             GLib.idle_add(self._icon.set_tooltip_text, cmd.get("text", ""))
         elif t == "set_menu":
-            self._room   = cmd.get("room",   "Sin ubicación")
-            self._hotkey = cmd.get("hotkey", "Ctrl+F12")
+            self._location = cmd.get("location", "Sin ubicación")
+            self._hotkey   = cmd.get("hotkey",   "Ctrl+F12")
         elif t == "quit":
             GLib.idle_add(Gtk.main_quit)
 

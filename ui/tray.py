@@ -85,9 +85,11 @@ class TrayIcon:
     def update_location(self, room: str):
         self.cfg["room"] = room
         if self._proc:
+            parts    = [self.cfg.get(k, "") for k in ("center", "building", "floor", "room")]
+            location = " › ".join(p for p in parts if p) or "Sin ubicación"
             self._send({"cmd": "set_menu",
-                        "room":   room or "Sin ubicación",
-                        "hotkey": self.cfg.get("hotkey_display", "Ctrl+F12")})
+                        "location": location,
+                        "hotkey":   self.cfg.get("hotkey_display", "Ctrl+F12")})
         elif self._icon:
             self._icon.menu = self._build_pystray_menu()
 
@@ -170,9 +172,11 @@ class TrayIcon:
         # Estado inicial
         self._send({"cmd": "set_icon",    "png_b64": _icon_to_png_b64(_ICONS[self._status])})
         self._send({"cmd": "set_tooltip", "text": self._get_title()})
+        parts    = [self.cfg.get(k, "") for k in ("center", "building", "floor", "room")]
+        location = " › ".join(p for p in parts if p) or "Sin ubicación"
         self._send({"cmd": "set_menu",
-                    "room":   self.cfg.get("room") or "Sin ubicación",
-                    "hotkey": self.cfg.get("hotkey_display", "Ctrl+F12")})
+                    "location": location,
+                    "hotkey":   self.cfg.get("hotkey_display", "Ctrl+F12")})
 
         # Bucle de lectura de acciones (bloquea hasta que el helper termina)
         for line in self._proc.stdout:
