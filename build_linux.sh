@@ -42,6 +42,9 @@ info "Compilando con PyInstaller..."
     --hidden-import "pynput.keyboard._xorg" \
     --hidden-import "pynput.mouse._xorg" \
     --hidden-import "PIL._tkinter_finder" \
+    --hidden-import "pkg_resources._vendor.jaraco.text" \
+    --hidden-import "pkg_resources._vendor.jaraco.functools" \
+    --hidden-import "pkg_resources._vendor.jaraco.context" \
     --collect-all jaraco \
     main.py
 
