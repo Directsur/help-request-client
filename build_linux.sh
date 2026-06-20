@@ -42,6 +42,14 @@ info "Compilando con PyInstaller..."
     --hidden-import "pynput.keyboard._xorg" \
     --hidden-import "pynput.mouse._xorg" \
     --hidden-import "PIL._tkinter_finder" \
+    --hidden-import "pystray._xorg" \
+    --hidden-import "xlib" \
+    --hidden-import "Xlib" \
+    --hidden-import "Xlib.display" \
+    --hidden-import "Xlib.X" \
+    --hidden-import "Xlib.Xatom" \
+    --hidden-import "Xlib.protocol" \
+    --hidden-import "Xlib.ext" \
     main.py
 
 [[ -f "dist/$APP_NAME" ]] || error "PyInstaller no generó el binario"
