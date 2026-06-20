@@ -33,20 +33,18 @@ chmod +x SolicitudAyuda-x86_64.AppImage
 O bien, en el gestor de archivos: clic derecho sobre el archivo →
 **Propiedades → Permisos → Permitir ejecutar el archivo como programa**.
 
-### Paso 2 — Mover a una ubicación permanente (recomendado)
+### Paso 2 — Ejecutar
 
 ```bash
-mkdir -p ~/.local/bin
-mv SolicitudAyuda-x86_64.AppImage ~/.local/bin/SolicitudAyuda
-```
-
-### Paso 3 — Ejecutar
-
-```bash
-~/.local/bin/SolicitudAyuda
+./SolicitudAyuda-x86_64.AppImage
 ```
 
 O haga doble clic en el archivo desde el gestor de archivos.
+
+> **Instalación automática:** en el primer inicio, la aplicación se copia automáticamente
+> a `~/.local/bin/SolicitudAyuda`. A partir de ese momento el autoarranque y las
+> actualizaciones automáticas usarán siempre esa ruta fija. No es necesario mover el
+> archivo manualmente.
 
 ---
 
@@ -64,8 +62,22 @@ O haga doble clic en el archivo desde el gestor de archivos.
    - Los cuatro campos de ubicación son obligatorios.
 3. Pulse **Confirmar ubicación**. El icono aparece en la bandeja del sistema.
 
-La aplicación se configura automáticamente para **arrancar con la sesión de escritorio**
-mediante un archivo `.desktop` en `~/.config/autostart/`.
+La aplicación se configura automáticamente para **arrancar con la sesión de escritorio**:
+
+- Entornos con gestor de sesión XDG (GNOME, KDE, XFCE, lxsession…): archivo `.desktop`
+  en `~/.config/autostart/`.
+- **Openbox** sin gestor de sesión XDG: entrada añadida a `~/.config/openbox/autostart`.
+
+En ambos casos el ejecutable que se lanza es `~/.local/bin/SolicitudAyuda`.
+
+---
+
+## Actualizaciones automáticas
+
+La aplicación comprueba en segundo plano si hay una nueva versión disponible (60 segundos
+después del arranque). Si la hay, la descarga directamente sobre `~/.local/bin/SolicitudAyuda`
+y envía una notificación de escritorio. La nueva versión queda activa en el siguiente
+inicio de la aplicación.
 
 ---
 

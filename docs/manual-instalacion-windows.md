@@ -19,15 +19,16 @@ administrador de sistemas (carpeta de red compartida, intranet del centro, etc.)
 
 El cliente **no requiere instalación**. Es un único ejecutable portátil.
 
-1. Copie `SolicitudAyuda.exe` a una carpeta permanente, por ejemplo:
-   ```
-   C:\Archivos de programa\SolicitudAyuda\SolicitudAyuda.exe
-   ```
-   o en su carpeta de usuario:
-   ```
-   C:\Users\<su usuario>\AppData\Local\SolicitudAyuda\SolicitudAyuda.exe
-   ```
+1. Descargue `SolicitudAyuda.exe` a cualquier carpeta accesible (Escritorio, Descargas…).
 2. Haga doble clic para ejecutarlo.
+
+> **Instalación automática:** en el primer inicio, la aplicación se copia automáticamente
+> a su ubicación fija:
+> ```
+> C:\Users\<su usuario>\AppData\Local\SolicitudAyuda\SolicitudAyuda.exe
+> ```
+> El arranque automático de Windows y las actualizaciones automáticas usan siempre esa
+> ruta fija. No es necesario mover el archivo manualmente.
 
 ### Aviso de Windows SmartScreen
 
@@ -71,11 +72,22 @@ Al arrancar por primera vez:
 ## Arranque automático con Windows
 
 La aplicación se configura para arrancar automáticamente con Windows durante el primer
-inicio. Esto se hace a través del Registro de Windows (clave `HKCU\Software\Microsoft\
-Windows\CurrentVersion\Run`) y no requiere permisos de administrador.
+inicio. La entrada del Registro apunta siempre a la ruta fija
+`%LOCALAPPDATA%\SolicitudAyuda\SolicitudAyuda.exe`, por lo que el arranque automático
+sobrevive a actualizaciones sin necesidad de reconfigurarlo.
 
 Para desactivar el arranque automático, elimine la entrada «SolicitudAyuda» en:
 **Administrador de tareas → Inicio → SolicitudAyuda → Deshabilitar**
+
+---
+
+## Actualizaciones automáticas
+
+La aplicación comprueba en segundo plano si hay una nueva versión disponible (60 segundos
+después del arranque). Si la hay, la descarga en segundo plano y muestra una notificación.
+La actualización se aplica automáticamente en el siguiente inicio: al arrancar, la
+aplicación detecta el archivo descargado, lo copia sobre sí misma y se relanza sin
+intervención del usuario.
 
 ---
 

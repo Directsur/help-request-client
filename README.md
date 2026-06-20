@@ -22,7 +22,8 @@ Este repositorio contiene el **cliente de escritorio** multiplataforma. El servi
 - **Configuración de ubicación en cascada** — selects dependientes Centro → Edificio → Planta → Sala con posibilidad de añadir nuevos elementos desde el propio cliente
 - **URL de servidor manual** — para redes multi-segmento donde el servidor está en un CPD o segmento diferente al que el broadcast UDP no llega
 - **Atajo configurable desde el servidor** — se distribuye automáticamente a todos los clientes al arrancar
-- **Autoarranque con el sistema operativo** sin intervención del usuario
+- **Autoarranque con el sistema operativo** sin intervención del usuario (ruta de instalación fija en Windows y Linux)
+- **Auto-actualización** en Linux (AppImage) y Windows (.exe) — descarga e instala nuevas versiones en segundo plano
 - **Soporte Wayland** en Linux — registra atajos en GNOME y KDE automáticamente
 - **Notificación sonora** al recibir alertas
 
@@ -138,7 +139,8 @@ help-request-client/
 │   └── network.py                   # Descubrimiento de servidor, registro, heartbeat, API REST
 ├── platform_support/
 │   ├── hotkey.py                    # Registro de hotkeys globales con pynput
-│   ├── autostart.py                 # Arranque automático (registro/LaunchAgent/.desktop)
+│   ├── autostart.py                 # Arranque automático (registro/LaunchAgent/.desktop/Openbox)
+│   ├── updater.py                   # Auto-actualización desde GitHub Releases (Linux y Windows)
 │   ├── sound.py                     # Sonido de alerta por plataforma
 │   ├── trigger_socket.py            # Socket Unix para disparos externos (Wayland)
 │   ├── wayland_shortcuts.py         # Registro de atajos en GNOME y KDE Plasma
