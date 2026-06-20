@@ -38,6 +38,8 @@ jobs:
           pip install pyinstaller
 
       - name: Compilar
+        env:
+          APP_VERSION: ${{ github.event.release.tag_name || inputs.tag }}
         run: python build.py
 
       - name: Adjuntar al release

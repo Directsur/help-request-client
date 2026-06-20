@@ -34,6 +34,15 @@ def disable():
 
 # ─── Windows ───────────────────────────────────────────────────────────────────
 
+def _win_exec() -> str:
+    """En Windows usamos la ruta fija de instalación para que el autoarranque
+    sobreviva a actualizaciones y a mover el .exe original."""
+    if getattr(sys, "frozen", False):
+        from platform_support.updater import WIN_INSTALL
+        return WIN_INSTALL
+    return _executable_path()
+
+
 def _enable_windows():
     import winreg
     key = winreg.OpenKey(
@@ -41,7 +50,7 @@ def _enable_windows():
         r"Software\Microsoft\Windows\CurrentVersion\Run",
         0, winreg.KEY_SET_VALUE,
     )
-    winreg.SetValueEx(key, "SolicitudAyuda", 0, winreg.REG_SZ, _executable_path())
+    winreg.SetValueEx(key, "SolicitudAyuda", 0, winreg.REG_SZ, _win_exec())
     winreg.CloseKey(key)
 
 

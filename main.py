@@ -262,6 +262,8 @@ def _handle_trigger_args() -> bool:
 def main():
     global _app_cfg, _tray, _send_enabled
 
+    updater.apply_pending_update()  # Windows: aplica update descargado y relanza
+
     if _handle_trigger_args():
         return
 

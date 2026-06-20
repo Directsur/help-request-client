@@ -12,6 +12,13 @@ import sys
 NAME = "SolicitudAyuda"
 SYSTEM = platform.system()
 
+# Graba la versión (tag del release) para que el módulo updater pueda
+# compararla con la última versión disponible en GitHub.
+app_version = os.environ.get("APP_VERSION", "dev")
+with open("version.txt", "w") as f:
+    f.write(app_version)
+print(f"Versión: {app_version}")
+
 args = [
     sys.executable, "-m", "PyInstaller",
     "--noconfirm",
@@ -20,6 +27,7 @@ args = [
     "--onefile",
     "--noconsole",
     "--add-data", f"ui{os.sep}*{os.pathsep}ui",
+    "--add-data", f"version.txt{os.pathsep}.",
     "main.py",
 ]
 
