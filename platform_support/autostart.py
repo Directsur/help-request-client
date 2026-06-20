@@ -43,29 +43,46 @@ def _win_exec() -> str:
     return _executable_path()
 
 
+_WIN_RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
+
+
+def _win_is_system_install() -> bool:
+    from platform_support.updater import get_win_install_path, WIN_SYSTEM_INSTALL
+    return get_win_install_path() == WIN_SYSTEM_INSTALL
+
+
 def _enable_windows():
     import winreg
-    key = winreg.OpenKey(
-        winreg.HKEY_CURRENT_USER,
-        r"Software\Microsoft\Windows\CurrentVersion\Run",
-        0, winreg.KEY_SET_VALUE,
-    )
-    winreg.SetValueEx(key, "SolicitudAyuda", 0, winreg.REG_SZ, _win_exec())
-    winreg.CloseKey(key)
+    exe = _win_exec()
+    # Instalación del sistema (C:\ProgramData\) → HKLM aplica a todos los usuarios,
+    # incluidos los que creen perfil después del despliegue.
+    # Instalación de usuario (%LOCALAPPDATA%) → HKCU solo para el usuario actual.
+    if _win_is_system_install():
+        hive = winreg.HKEY_LOCAL_MACHINE
+    else:
+        hive = winreg.HKEY_CURRENT_USER
+    try:
+        key = winreg.OpenKey(hive, _WIN_RUN_KEY, 0, winreg.KEY_SET_VALUE)
+        winreg.SetValueEx(key, "SolicitudAyuda", 0, winreg.REG_SZ, exe)
+        winreg.CloseKey(key)
+    except PermissionError:
+        # Sin privilegios para HKLM → caer a HKCU
+        key = winreg.OpenKey(
+            winreg.HKEY_CURRENT_USER, _WIN_RUN_KEY, 0, winreg.KEY_SET_VALUE
+        )
+        winreg.SetValueEx(key, "SolicitudAyuda", 0, winreg.REG_SZ, exe)
+        winreg.CloseKey(key)
 
 
 def _disable_windows():
     import winreg
-    try:
-        key = winreg.OpenKey(
-            winreg.HKEY_CURRENT_USER,
-            r"Software\Microsoft\Windows\CurrentVersion\Run",
-            0, winreg.KEY_SET_VALUE,
-        )
-        winreg.DeleteValue(key, "SolicitudAyuda")
-        winreg.CloseKey(key)
-    except FileNotFoundError:
-        pass
+    for hive in (winreg.HKEY_LOCAL_MACHINE, winreg.HKEY_CURRENT_USER):
+        try:
+            key = winreg.OpenKey(hive, _WIN_RUN_KEY, 0, winreg.KEY_SET_VALUE)
+            winreg.DeleteValue(key, "SolicitudAyuda")
+            winreg.CloseKey(key)
+        except (FileNotFoundError, PermissionError):
+            pass
 
 
 # ─── Linux ─────────────────────────────────────────────────────────────────────
