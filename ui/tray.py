@@ -7,7 +7,6 @@ import os
 import platform
 import subprocess
 import sys
-import threading
 from PIL import Image, ImageDraw
 import pystray
 
@@ -112,9 +111,9 @@ class TrayIcon:
 
     def _dispatch(self, action: str):
         if action == "open_config":
-            threading.Thread(target=self.on_open_config, daemon=True).start()
+            self.on_open_config()
         elif action == "help":
-            threading.Thread(target=self.on_help, daemon=True).start()
+            self.on_help()
         elif action == "quit":
             self._send({"cmd": "quit"})
             self.on_quit()

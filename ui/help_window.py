@@ -161,7 +161,7 @@ Soporte técnico, instalación y consultas
 # ─── Ventana ───────────────────────────────────────────────────────────────────
 
 def show():
-    win = tk.Toplevel()
+    win = tk.Tk()
     win.title("Solicitudes de Ayuda — Ayuda")
     win.geometry("680x540")
     win.minsize(500, 400)
@@ -238,3 +238,4 @@ def show():
 
     win.bind("<Escape>", lambda _: win.destroy())
     win.focus_force()
+    win.mainloop()
