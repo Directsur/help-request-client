@@ -279,14 +279,13 @@ def main():
             on_drill=lambda: alert.send_drill_alert(_app_cfg) if _send_enabled else None,
         )
 
-    # Descubrimiento inicial del servidor en un thread para no bloquear la UI
-    def init_server():
-        manual_url = _app_cfg.get("server_url", "")
-        server_ip = manual_url or network.discover_server(timeout=3)
-        if server_ip:
-            _on_server_found(server_ip)
+    # Descubrimiento inicial síncrono para que la ventana de configuración
+    # ya tenga el servidor resuelto al abrirse.
+    manual_url = _app_cfg.get("server_url", "")
+    server_ip = manual_url or network.discover_server(timeout=3)
+    if server_ip:
+        _on_server_found(server_ip)
 
-    threading.Thread(target=init_server, daemon=True, name="init-server").start()
     threading.Thread(target=_heartbeat_loop, daemon=True, name="heartbeat").start()
 
     # Ventana de configuración de ubicación

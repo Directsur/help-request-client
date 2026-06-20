@@ -15,7 +15,7 @@ def show(hotkey_display: str, location_text: str, send_enabled: bool):
     w, h = 440, 380
     sw = root.winfo_screenwidth()
     sh = root.winfo_screenheight()
-    root.geometry(f"{w}+{(sw - w) // 2}+{(sh - h) // 2}")
+    root.geometry(f"{w}x{h}+{(sw - w) // 2}+{(sh - h) // 2}")
 
     bold_lg = font(14, "bold")
     bold_md = font(11, "bold")
