@@ -23,12 +23,32 @@ El cliente **no requiere instalación**. Es un único ejecutable portátil.
 2. Haga doble clic para ejecutarlo.
 
 > **Instalación automática:** en el primer inicio, la aplicación se copia automáticamente
-> a su ubicación fija:
-> ```
-> C:\Users\<su usuario>\AppData\Local\SolicitudAyuda\SolicitudAyuda.exe
-> ```
-> El arranque automático de Windows y las actualizaciones automáticas usan siempre esa
-> ruta fija. No es necesario mover el archivo manualmente.
+> a su ubicación fija. Se intentan en orden:
+> 1. `C:\ProgramData\SolicitudAyuda\SolicitudAyuda.exe` — compartida por todos los
+>    usuarios del equipo (requiere permisos de administrador).
+> 2. `C:\Users\<su usuario>\AppData\Local\SolicitudAyuda\SolicitudAyuda.exe` — solo
+>    para el usuario actual (sin permisos especiales).
+>
+> El arranque automático de Windows usa siempre la ruta donde quedó instalada.
+> No es necesario mover el archivo manualmente.
+
+### Instalación compartida para todos los usuarios del equipo
+
+Si un mismo equipo tiene varios usuarios y todos deben tener acceso a la aplicación,
+el administrador puede instalarla en la ruta del sistema ejecutando **una sola vez**
+`SolicitudAyuda.exe` como administrador (clic derecho → «Ejecutar como administrador»).
+
+Alternativamente, puede copiarla manualmente con permisos elevados:
+
+```
+mkdir "C:\ProgramData\SolicitudAyuda"
+copy SolicitudAyuda.exe "C:\ProgramData\SolicitudAyuda\SolicitudAyuda.exe"
+```
+
+Cada usuario deberá ejecutar la aplicación una vez para que se configure su propio
+arranque automático y sus ajustes de ubicación. Las actualizaciones automáticas quedan
+deshabilitadas en instalaciones del sistema; el administrador las gestiona repitiendo
+la copia con la nueva versión.
 
 ### Aviso de Windows SmartScreen
 
@@ -72,9 +92,9 @@ Al arrancar por primera vez:
 ## Arranque automático con Windows
 
 La aplicación se configura para arrancar automáticamente con Windows durante el primer
-inicio. La entrada del Registro apunta siempre a la ruta fija
-`%LOCALAPPDATA%\SolicitudAyuda\SolicitudAyuda.exe`, por lo que el arranque automático
-sobrevive a actualizaciones sin necesidad de reconfigurarlo.
+inicio. La entrada del Registro (`HKCU\...\Run`) apunta siempre a la ruta fija donde
+quedó instalada (`C:\ProgramData\` o `%LOCALAPPDATA%`), por lo que el arranque
+automático sobrevive a actualizaciones sin necesidad de reconfigurarlo.
 
 Para desactivar el arranque automático, elimine la entrada «SolicitudAyuda» en:
 **Administrador de tareas → Inicio → SolicitudAyuda → Deshabilitar**

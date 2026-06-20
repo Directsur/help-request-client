@@ -35,11 +35,11 @@ def disable():
 # ─── Windows ───────────────────────────────────────────────────────────────────
 
 def _win_exec() -> str:
-    """En Windows usamos la ruta fija de instalación para que el autoarranque
-    sobreviva a actualizaciones y a mover el .exe original."""
+    """En Windows apunta a la ruta fija de instalación (sistema o usuario)
+    para que el autoarranque sobreviva a actualizaciones."""
     if getattr(sys, "frozen", False):
-        from platform_support.updater import WIN_INSTALL
-        return WIN_INSTALL
+        from platform_support.updater import get_win_install_path
+        return get_win_install_path()
     return _executable_path()
 
 

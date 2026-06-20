@@ -49,14 +49,33 @@ def get_linux_install_path() -> str:
     return _linux_resolved or LINUX_USER_INSTALL
 
 if platform.system() == "Windows":
-    _WIN_DIR     = os.path.join(
+    _WIN_SYSTEM_DIR  = r"C:\ProgramData\SolicitudAyuda"
+    _WIN_USER_DIR    = os.path.join(
         os.environ.get("LOCALAPPDATA", os.path.expanduser("~")), "SolicitudAyuda"
     )
-    WIN_INSTALL  = os.path.join(_WIN_DIR, "SolicitudAyuda.exe")
-    _WIN_PENDING = os.path.join(_WIN_DIR, "SolicitudAyuda_new.exe")
-    _WIN_BATCH   = os.path.join(_WIN_DIR, "apply_update.bat")
+    WIN_SYSTEM_INSTALL = os.path.join(_WIN_SYSTEM_DIR, "SolicitudAyuda.exe")
+    WIN_USER_INSTALL   = os.path.join(_WIN_USER_DIR,   "SolicitudAyuda.exe")
 else:
-    _WIN_DIR = WIN_INSTALL = _WIN_PENDING = _WIN_BATCH = ""
+    _WIN_SYSTEM_DIR = _WIN_USER_DIR = ""
+    WIN_SYSTEM_INSTALL = WIN_USER_INSTALL = ""
+
+# Ruta resuelta tras install_to_stable_location(); usada por autostart y updater.
+_win_resolved: str = ""
+
+
+def get_win_install_path() -> str:
+    """Ruta donde está instalado el .exe (resuelta tras install_to_stable_location)."""
+    return _win_resolved or WIN_USER_INSTALL
+
+
+def _win_pending_path() -> str:
+    d = os.path.dirname(get_win_install_path())
+    return os.path.join(d, "SolicitudAyuda_new.exe")
+
+
+def _win_batch_path() -> str:
+    d = os.path.dirname(get_win_install_path())
+    return os.path.join(d, "apply_update.bat")
 
 
 # ── versión embebida ──────────────────────────────────────────────────────────
@@ -76,12 +95,13 @@ def current_version() -> str:
 def install_to_stable_location():
     """Copia el ejecutable a su ruta fija si todavía no está ahí.
 
-    En Linux prueba primero /usr/local/bin/ (accesible para todos los usuarios del
-    equipo). Si no hay permiso de escritura, usa ~/.local/bin/ como fallback.
-    La ruta elegida queda almacenada en _linux_resolved para que autostart y
-    el actualizador la usen.
+    Linux: prueba /usr/local/bin/ (multiusuario) y cae a ~/.local/bin/.
+    Windows: prueba C:\\ProgramData\\SolicitudAyuda\\ (multiusuario) y cae
+             a %LOCALAPPDATA%\\SolicitudAyuda\\.
+    La ruta elegida queda almacenada en _linux_resolved / _win_resolved para
+    que autostart y el actualizador la usen.
     """
-    global _linux_resolved
+    global _linux_resolved, _win_resolved
     if not getattr(sys, "frozen", False):
         return
 
@@ -89,10 +109,8 @@ def install_to_stable_location():
 
     if system == "Linux":
         src = os.path.realpath(sys.executable)
-
         for candidate in (LINUX_SYSTEM_INSTALL, LINUX_USER_INSTALL):
             if src == os.path.realpath(candidate):
-                # Ya está en una ruta fija — solo actualizamos _linux_resolved.
                 _linux_resolved = candidate
                 return
             try:
@@ -104,18 +122,24 @@ def install_to_stable_location():
                 _linux_resolved = candidate
                 return
             except (PermissionError, OSError):
-                continue  # Sin permiso → probar siguiente candidato
+                continue
 
     elif system == "Windows":
         src = os.path.realpath(sys.executable)
-        dst = os.path.realpath(WIN_INSTALL)
-        if src == dst:
-            return
-        try:
-            os.makedirs(_WIN_DIR, exist_ok=True)
-            shutil.copy2(src, WIN_INSTALL)
-        except Exception:
-            pass
+        for candidate, candidate_dir in (
+            (WIN_SYSTEM_INSTALL, _WIN_SYSTEM_DIR),
+            (WIN_USER_INSTALL,   _WIN_USER_DIR),
+        ):
+            if src == os.path.realpath(candidate):
+                _win_resolved = candidate
+                return
+            try:
+                os.makedirs(candidate_dir, exist_ok=True)
+                shutil.copy2(src, candidate)
+                _win_resolved = candidate
+                return
+            except (PermissionError, OSError):
+                continue
 
 
 # ── aplicar actualización pendiente (solo Windows) ───────────────────────────
@@ -129,23 +153,26 @@ def apply_pending_update():
     """
     if platform.system() != "Windows" or not getattr(sys, "frozen", False):
         return
-    if not os.path.isfile(_WIN_PENDING):
+    win_install = get_win_install_path()
+    win_pending = _win_pending_path()
+    win_batch   = _win_batch_path()
+    if not os.path.isfile(win_pending):
         return
 
     batch = (
         "@echo off\n"
         "ping -n 3 127.0.0.1 > nul\n"
-        f'copy /Y "{_WIN_PENDING}" "{WIN_INSTALL}"\n'
-        f'del "{_WIN_PENDING}"\n'
-        f'start "" "{WIN_INSTALL}"\n'
+        f'copy /Y "{win_pending}" "{win_install}"\n'
+        f'del "{win_pending}"\n'
+        f'start "" "{win_install}"\n'
         'del "%~f0"\n'
     )
     try:
-        os.makedirs(_WIN_DIR, exist_ok=True)
-        with open(_WIN_BATCH, "w") as f:
+        os.makedirs(os.path.dirname(win_install), exist_ok=True)
+        with open(win_batch, "w") as f:
             f.write(batch)
         subprocess.Popen(
-            ["cmd", "/c", _WIN_BATCH],
+            ["cmd", "/c", win_batch],
             creationflags=0x08000000 | 0x00000008,  # CREATE_NO_WINDOW | DETACHED_PROCESS
         )
     except Exception:
@@ -249,8 +276,13 @@ def _update_worker():
             )
 
     elif system == "Windows":
-        os.makedirs(_WIN_DIR, exist_ok=True)
-        ok = _download_to(asset_url, _WIN_PENDING)
+        win_install = get_win_install_path()
+        if win_install == WIN_SYSTEM_INSTALL:
+            # Instalación del sistema: el administrador gestiona las actualizaciones.
+            return
+        win_pending = _win_pending_path()
+        os.makedirs(os.path.dirname(win_install), exist_ok=True)
+        ok = _download_to(asset_url, win_pending)
         if ok:
             _notify_windows(
                 f"Nueva versión {latest_tag} disponible.\n"
