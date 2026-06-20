@@ -42,6 +42,7 @@ info "Compilando con PyInstaller..."
     --hidden-import "pynput.keyboard._xorg" \
     --hidden-import "pynput.mouse._xorg" \
     --hidden-import "PIL._tkinter_finder" \
+    --collect-all jaraco \
     main.py
 
 [[ -f "dist/$APP_NAME" ]] || error "PyInstaller no generó el binario"
