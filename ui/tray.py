@@ -2,25 +2,34 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 import os
 import platform
+import subprocess
+import sys
 import threading
 from PIL import Image, ImageDraw
-import pystray
 
-# En WMs ligeros sobre X11 (Openbox, i3, bspwm…) forzamos el backend XOrg
-# de pystray, que usa el protocolo XEMBED compatible con tint2/polybar/etc.
-# En Wayland o entornos de escritorio completos (GNOME, KDE…) dejamos que
-# pystray elija su backend (AppIndicator/StatusNotifierItem).
-if platform.system() == "Linux":
-    _desktop = os.environ.get("XDG_CURRENT_DESKTOP", "").lower()
-    _session = os.environ.get("XDG_SESSION_TYPE", "").lower()
-    _FULL_DE = {"gnome", "kde", "unity", "xfce", "lxde", "mate",
-                "cinnamon", "budgie", "pantheon"}
-    if _session != "wayland" and not any(d in _desktop for d in _FULL_DE):
-        try:
-            from pystray import _xorg as _linux_backend
-            pystray.Icon = _linux_backend.Icon
-        except ImportError:
-            pass
+# En el AppImage (bundle PyInstaller), gi.repository no está incluido porque
+# GTK es una biblioteca del sistema. Lo buscamos en el Python del sistema para
+# que pystray auto-detecte el backend GTK (Gtk.StatusIcon), que es el que
+# funciona con tint2/XEmbed igual que nm-applet o pasystray.
+# En Wayland dejamos la detección por defecto (AppIndicator/StatusNotifierItem).
+if (platform.system() == "Linux"
+        and getattr(sys, "frozen", False)
+        and os.environ.get("XDG_SESSION_TYPE", "").lower() != "wayland"
+        and not os.environ.get("WAYLAND_DISPLAY")):
+    try:
+        _sp = subprocess.run(
+            ["python3", "-c",
+             "import site; print('\\n'.join(p for p in site.getsitepackages() if p))"],
+            capture_output=True, text=True, timeout=2,
+        )
+        if _sp.returncode == 0:
+            for _p in _sp.stdout.strip().splitlines():
+                if _p and os.path.isdir(_p) and _p not in sys.path:
+                    sys.path.insert(0, _p)
+    except Exception:
+        pass
+
+import pystray
 
 
 def _make_icon(color: str, size: int = 22) -> Image.Image:
