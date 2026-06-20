@@ -23,16 +23,21 @@ if platform.system() == "Linux":
             pass
 
 
-def _make_icon(color: str) -> Image.Image:
-    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+def _make_icon(color: str, size: int = 64) -> Image.Image:
+    # Dibujamos a 4× y reducimos con LANCZOS para obtener antialiasing
+    S = size * 4
+    img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
-    # Triángulo de alerta
-    draw.polygon([(32, 4), (62, 58), (2, 58)], fill=color)
-    draw.polygon([(32, 18), (50, 50), (14, 50)], fill="white")
-    # Signo de exclamación
-    draw.rectangle([29, 26, 35, 42], fill=color)
-    draw.ellipse([29, 45, 35, 51], fill=color)
-    return img
+    m = S / 64  # factor de escala respecto al diseño original a 64 px
+    draw.polygon([
+        (32*m,  4*m), (62*m, 58*m), (2*m, 58*m),
+    ], fill=color)
+    draw.polygon([
+        (32*m, 18*m), (50*m, 50*m), (14*m, 50*m),
+    ], fill="white")
+    draw.rectangle([29*m, 26*m, 35*m, 42*m], fill=color)
+    draw.ellipse([29*m, 45*m, 35*m, 51*m], fill=color)
+    return img.resize((size, size), Image.LANCZOS)
 
 
 _ICONS = {
