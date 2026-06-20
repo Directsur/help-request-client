@@ -153,6 +153,14 @@ def get_server_config(server_ip: str) -> dict:
         return {}
 
 
+def ping(server_ip: str) -> bool:
+    try:
+        r = _SESSION.get(f"{_api(server_ip)}/api/config", timeout=3)
+        return r.ok
+    except Exception:
+        return False
+
+
 def send_heartbeat_udp(client_id: str):
     payload = json.dumps({"type": "HEARTBEAT", "client_id": client_id}).encode()
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

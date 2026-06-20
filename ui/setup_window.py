@@ -188,13 +188,15 @@ class SetupWindow:
             fg="#f39c12"
         )
         self.root.update_idletasks()
-        self._load_centers()
         if url:
-            if self._centers:
+            if network.ping(self.server_ip):
                 self._url_status.config(text="Conectado", fg="#27ae60")
+                self._load_centers()
             else:
+                self.server_ip = None
                 self._url_status.config(text="No se pudo conectar. Comprueba la URL.", fg="#e74c3c")
         else:
+            self._load_centers()
             self._url_status.config(text="Usando descubrimiento automático", fg="#7fb3d3")
 
     def _reset_downstream(self, from_level: str):
