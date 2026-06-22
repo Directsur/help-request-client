@@ -1,6 +1,7 @@
 # Copyright (C) 2025-2026 Direct Sevilla Global Services SL
 # SPDX-License-Identifier: AGPL-3.0-or-later
 import getpass
+import socket
 import threading
 import time
 from datetime import datetime
@@ -25,6 +26,7 @@ def _do_send(app_cfg: dict, is_drill: bool):
     username = getpass.getuser()
     alert = {
         "client_id": app_cfg["client_id"],
+        "hostname":  socket.gethostname(),
         "username":  username,
         "group_id":  app_cfg.get("group_id"),
         "is_drill":  is_drill,
@@ -111,7 +113,7 @@ def on_udp_message(msg: dict, from_ip: str, app_cfg: dict):
 
 def build_alert_text(msg: dict) -> str:
     username  = msg.get("username", "desconocido")
-    client_id = msg.get("client_id", "desconocido")
+    hostname  = msg.get("hostname") or msg.get("client_id", "desconocido")
     loc       = msg.get("location", {})
     room      = loc.get("room", "")
     floor     = loc.get("floor", "")
@@ -133,13 +135,13 @@ def build_alert_text(msg: dict) -> str:
     if msg.get("is_drill"):
         return (
             f"El usuario {username} está simulando una solicitud de ayuda\n"
-            f"desde su equipo {client_id},\n"
+            f"desde su equipo {hostname},\n"
             f"ubicado en {location_str}.\n\n"
             f"ESTO ES UN SIMULACRO. No se requiere ninguna acción real."
         )
 
     return (
         f"El usuario {username} está solicitando ayuda\n"
-        f"desde su equipo {client_id},\n"
+        f"desde su equipo {hostname},\n"
         f"ubicado en {location_str}."
     )
