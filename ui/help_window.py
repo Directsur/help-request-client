@@ -137,6 +137,51 @@ El cliente no encuentra el servidor (icono rojo o gris persistente).
   No necesita internet en ningún momento.\
 """),
 
+    ("Instalación, actualización y desinstalación", """\
+La aplicación se gestiona desde la línea de comandos con las siguientes opciones.
+Todas muestran una ventana gráfica de confirmación antes de actuar.
+
+──  Instalación del sistema (todos los usuarios)
+
+  Requiere ejecutarse como root (Linux/macOS) o Administrador (Windows).
+  Copia el ejecutable a la ruta del sistema y activa el autoarranque para
+  todos los usuarios del equipo, incluidos los que se creen en el futuro.
+
+    Linux:   sudo ./SolicitudAyuda-x86_64.AppImage --install
+    Windows: SolicitudAyuda.exe --install   (como Administrador)
+    macOS:   sudo /ruta/SolicitudAyuda.app/Contents/MacOS/SolicitudAyuda --install
+
+  Rutas del sistema:
+    Linux:   /usr/local/bin/SolicitudAyuda
+             /etc/xdg/autostart/help-request.desktop
+    Windows: C:\\ProgramData\\SolicitudAyuda\\SolicitudAyuda.exe
+             HKLM\\...\\CurrentVersion\\Run
+    macOS:   /Applications/SolicitudAyuda.app
+             /Library/LaunchAgents/es.centrosalud.solicitudayuda.plist
+
+  Las actualizaciones automáticas quedan deshabilitadas en instalaciones del
+  sistema. Para actualizar, el administrador repite el mismo comando con la
+  nueva versión.
+
+──  Desinstalación
+
+  Elimina el ejecutable, el autoarranque y la configuración del usuario actual.
+
+    Linux:   SolicitudAyuda --uninstall
+    Windows: SolicitudAyuda --uninstall
+    macOS:   /Applications/SolicitudAyuda.app/Contents/MacOS/SolicitudAyuda --uninstall
+
+  En instalaciones del sistema, ejecute como root/Administrador para eliminar
+  también el ejecutable compartido y las entradas de autoarranque del sistema.
+
+    Linux:   sudo SolicitudAyuda --uninstall
+    Windows: SolicitudAyuda --uninstall   (como Administrador)
+    macOS:   sudo /Applications/SolicitudAyuda.app/Contents/MacOS/SolicitudAyuda --uninstall
+
+  Los datos de configuración de otros usuarios deben eliminarse manualmente
+  en cada perfil (carpeta ~/.config/HelpRequest/ o %APPDATA%\\HelpRequest\\).\
+"""),
+
     ("Licencia, soporte y contacto", """\
 Licencia
   Solicitudes de Ayuda se publica bajo la GNU Affero General Public
