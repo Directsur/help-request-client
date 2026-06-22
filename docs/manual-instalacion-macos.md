@@ -103,6 +103,28 @@ Para desactivar el arranque automático:
 
 ---
 
+## Instalación del sistema para todos los usuarios
+
+Si el equipo tiene varios usuarios y todos deben tener acceso a la aplicación,
+el administrador puede instalarla desde el Terminal como root:
+
+```bash
+sudo /Volumes/SolicitudAyuda/SolicitudAyuda.app/Contents/MacOS/SolicitudAyuda --install
+```
+
+(Sustituya la ruta por la ubicación donde tenga montado el `.dmg`.)
+
+Aparecerá una ventana de confirmación. Al aceptar, el instalador:
+
+- Copia el bundle `.app` a `/Applications/SolicitudAyuda.app`
+- Crea `/Library/LaunchAgents/es.centrosalud.solicitudayuda.plist`, que hace que
+  la aplicación arranque para **todos** los usuarios presentes y futuros
+
+Cada usuario verá la ventana de configuración de ubicación la primera vez que inicie
+sesión. Sus datos se guardan en su propio perfil (`~/.config/HelpRequest/`).
+
+---
+
 ## Desinstalación
 
 La forma más sencilla es usar el desinstalador integrado:
@@ -112,13 +134,29 @@ La forma más sencilla es usar el desinstalador integrado:
    ```bash
    /Applications/SolicitudAyuda.app/Contents/MacOS/SolicitudAyuda --uninstall
    ```
-3. Confirme en la ventana que aparece. El desinstalador eliminará el bundle `.app`,
-   el LaunchAgent de autoarranque y la configuración del usuario actual.
+   Si la aplicación fue instalada con `--install` (sistema), ejecútelo como root para
+   eliminar también las entradas del sistema:
+   ```bash
+   sudo /Applications/SolicitudAyuda.app/Contents/MacOS/SolicitudAyuda --uninstall
+   ```
+3. Confirme en la ventana que aparece. El desinstalador eliminará:
+   - El bundle `/Applications/SolicitudAyuda.app` (si se ejecuta como root)
+   - El LaunchAgent de autoarranque del sistema (`/Library/LaunchAgents/`, si aplica)
+   - El LaunchAgent de autoarranque del usuario actual (`~/Library/LaunchAgents/`, si aplica)
+   - La configuración del usuario actual (`~/.config/HelpRequest/`)
+
+> Los datos de configuración de otros usuarios deben eliminarse manualmente o con el
+> desinstalador en la sesión de cada usuario.
 
 ### Desinstalación manual
 
 ```bash
-rm -rf /Applications/SolicitudAyuda.app
+# Instalación del sistema (ejecutar como root)
+sudo launchctl unload /Library/LaunchAgents/es.centrosalud.solicitudayuda.plist
+sudo rm /Library/LaunchAgents/es.centrosalud.solicitudayuda.plist
+sudo rm -rf /Applications/SolicitudAyuda.app
+
+# Instalación de usuario actual
 launchctl unload ~/Library/LaunchAgents/es.centrosalud.solicitudayuda.plist
 rm ~/Library/LaunchAgents/es.centrosalud.solicitudayuda.plist
 rm -rf ~/.config/HelpRequest/

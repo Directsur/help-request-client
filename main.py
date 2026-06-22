@@ -262,6 +262,11 @@ def _handle_trigger_args() -> bool:
 def main():
     global _app_cfg, _tray, _send_enabled
 
+    if "--install" in sys.argv[1:]:
+        from platform_support.installer import run as _install
+        _install()
+        return
+
     if "--uninstall" in sys.argv[1:]:
         from platform_support.uninstaller import run as _uninstall
         _uninstall()

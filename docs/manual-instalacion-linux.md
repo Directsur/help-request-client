@@ -51,19 +51,33 @@ O haga doble clic en el archivo desde el gestor de archivos.
 > El autoarranque y las actualizaciones automáticas usarán siempre esa ruta fija.
 > No es necesario mover el archivo manualmente.
 
-### Instalación compartida para todos los usuarios del equipo
+### Instalación del sistema para todos los usuarios
 
-Si un mismo equipo tiene varios usuarios de Windows y todos deben tener acceso a la
-aplicación, el administrador puede instalarla en la ruta del sistema:
+Si el equipo tiene varios usuarios y todos deben tener acceso a la aplicación,
+use el instalador integrado ejecutando como **root**:
 
 ```bash
-sudo install -m 755 SolicitudAyuda-x86_64.AppImage /usr/local/bin/SolicitudAyuda
+sudo ./SolicitudAyuda-x86_64.AppImage --install
 ```
 
-Cada usuario deberá ejecutar la aplicación **una vez** para que se configure su propio
-autoarranque y sus ajustes de ubicación. Las actualizaciones automáticas quedan
-deshabilitadas en instalaciones del sistema; el administrador las gestiona manualmente
-ejecutando el mismo comando con la nueva versión.
+Aparecerá una ventana de confirmación que informa de las rutas que se van a utilizar.
+Al aceptar, el instalador realiza automáticamente:
+
+- Copia el ejecutable a `/usr/local/bin/SolicitudAyuda`
+- Crea `/etc/xdg/autostart/help-request.desktop` — lo leen todos los gestores de
+  sesión XDG (GNOME, KDE, XFCE, lxsession…) para **todos** los usuarios presentes
+  y futuros
+- Añade una entrada en `/etc/xdg/openbox/autostart` si Openbox está instalado
+
+Cada usuario verá la ventana de configuración de ubicación la primera vez que inicie
+sesión. Sus datos se guardan en su propio perfil (`~/.config/HelpRequest/`).
+
+Las actualizaciones automáticas quedan deshabilitadas en instalaciones del sistema.
+Para actualizar, el administrador vuelve a ejecutar el instalador con la nueva versión:
+
+```bash
+sudo ./SolicitudAyuda-nueva-version.AppImage --install
+```
 
 ---
 
@@ -146,23 +160,27 @@ Aparecerá una ventana de confirmación. Al aceptar, se eliminarán el ejecutabl
 el autoarranque y la configuración del usuario actual.
 
 > **Instalación del sistema** (`/usr/local/bin/`): el desinstalador necesita permisos
-> de administrador para borrar el ejecutable. Ejecútelo con:
+> de administrador para borrar el ejecutable y las entradas de autoarranque del sistema.
+> Ejecútelo con:
 > ```bash
 > sudo SolicitudAyuda --uninstall
 > ```
+> Los datos de configuración de otros usuarios (`~/.config/HelpRequest/` en cada perfil)
+> deben eliminarse manualmente o con el desinstalador en la sesión de cada usuario.
 
 ### Desinstalación manual
 
 ```bash
 # Detener la aplicación (clic derecho en icono → Salir)
-sudo rm /usr/local/bin/SolicitudAyuda   # instalación del sistema (si aplica)
-rm ~/.local/bin/SolicitudAyuda          # instalación de usuario (si aplica)
-rm ~/.config/autostart/help-request.desktop
+sudo rm /usr/local/bin/SolicitudAyuda           # instalación del sistema (si aplica)
+rm ~/.local/bin/SolicitudAyuda                  # instalación de usuario (si aplica)
+sudo rm /etc/xdg/autostart/help-request.desktop # autoarranque del sistema (si aplica)
+rm ~/.config/autostart/help-request.desktop     # autoarranque del usuario (si aplica)
 rm -rf ~/.config/HelpRequest/
 ```
 
 Para Openbox, elimine también las líneas marcadas `# SolicitudAyuda` de
-`~/.config/openbox/autostart`.
+`~/.config/openbox/autostart` y/o `/etc/xdg/openbox/autostart`.
 
 ---
 

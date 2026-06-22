@@ -5,10 +5,9 @@ Desinstalador limpio del cliente Solicitudes de Ayuda.
 
 Invocado con: SolicitudAyuda --uninstall
 
-Elimina:
-  - El ejecutable instalado (o el bundle .app en macOS)
-  - Las entradas de autoarranque (registro, .desktop, LaunchAgent, Openbox)
-  - El directorio de configuración del usuario actual
+Si se ejecuta como usuario normal elimina las entradas del usuario actual.
+Si se ejecuta como root/Administrador elimina también las entradas del sistema
+(/etc/xdg/autostart, HKLM, /Library/LaunchAgents, etc.).
 """
 import os
 import platform
@@ -21,18 +20,38 @@ from tkinter import messagebox
 import config
 
 
+# ── privilegios ───────────────────────────────────────────────────────────────
+
+def _is_root() -> bool:
+    if platform.system() == "Windows":
+        try:
+            import ctypes
+            return bool(ctypes.windll.shell32.IsUserAnAdmin())
+        except Exception:
+            return False
+    return os.getuid() == 0
+
+
 # ── diálogos ──────────────────────────────────────────────────────────────────
 
-def _confirm() -> bool:
+def _confirm(system_install: bool) -> bool:
     root = tk.Tk()
     root.withdraw()
+    if system_install:
+        scope = (
+            "  • El ejecutable del sistema y las entradas de autoarranque globales\n"
+            "  • Los datos de configuración de este usuario\n\n"
+            "Nota: los datos de configuración de otros usuarios no se eliminan."
+        )
+    else:
+        scope = (
+            "  • El ejecutable de la aplicación\n"
+            "  • La configuración de inicio automático de este usuario\n"
+            "  • Los datos de configuración de este usuario"
+        )
     ok = messagebox.askyesno(
         "Desinstalar Solicitudes de Ayuda",
-        "¿Desea desinstalar completamente Solicitudes de Ayuda?\n\n"
-        "Se eliminarán:\n"
-        "  • El ejecutable de la aplicación\n"
-        "  • La configuración de inicio automático\n"
-        "  • Los datos de configuración de este usuario\n\n"
+        f"¿Desea desinstalar Solicitudes de Ayuda?\n\nSe eliminarán:\n{scope}\n\n"
         "Esta acción no se puede deshacer.",
         icon="warning",
     )
@@ -62,34 +81,51 @@ def _error(msg: str):
 def _uninstall_linux():
     from platform_support import autostart
     from platform_support.updater import LINUX_SYSTEM_INSTALL, LINUX_USER_INSTALL
+    from platform_support.installer import (
+        LINUX_SYSTEM_DESKTOP, LINUX_SYSTEM_OPENBOX, LINUX_OPENBOX_MARKER
+    )
 
-    # Autoarranque (no requiere sudo)
+    root = _is_root()
+    if not _confirm(system_install=root):
+        return
+
+    # Autoarranque del usuario actual
     autostart.disable()
+
+    # Autoarranque del sistema (solo si root)
+    if root:
+        try:
+            os.remove(LINUX_SYSTEM_DESKTOP)
+        except (FileNotFoundError, PermissionError):
+            pass
+        if os.path.isfile(LINUX_SYSTEM_OPENBOX):
+            try:
+                lines = open(LINUX_SYSTEM_OPENBOX).readlines()
+                filtered = [l for l in lines
+                            if LINUX_OPENBOX_MARKER not in l
+                            and LINUX_SYSTEM_INSTALL not in l]
+                with open(LINUX_SYSTEM_OPENBOX, "w") as f:
+                    f.writelines(filtered)
+            except Exception:
+                pass
 
     # Configuración del usuario actual
     shutil.rmtree(config.CONFIG_DIR, ignore_errors=True)
 
-    # Ejecutable: intentar en orden sistema → usuario
-    removed = False
-    for path in (LINUX_SYSTEM_INSTALL, LINUX_USER_INSTALL):
+    # Ejecutable
+    candidates = ([LINUX_SYSTEM_INSTALL] if root else []) + [LINUX_USER_INSTALL]
+    for path in candidates:
         if not os.path.isfile(path):
             continue
         try:
             os.remove(path)
-            removed = True
             break
         except PermissionError:
             _error(
-                f"No se pudo eliminar {path} (se necesitan permisos de administrador).\n\n"
-                f"Ejecute de nuevo como root:\n"
-                f"  sudo {path} --uninstall"
+                f"No se pudo eliminar {path}.\n\n"
+                f"Ejecute como root:\n  sudo {path} --uninstall"
             )
             return
-
-    if not removed:
-        # El ejecutable no está en ninguna ruta conocida (lanzado desde otra ubicación).
-        # La configuración y el autoarranque ya se han eliminado.
-        pass
 
     _done()
 
@@ -100,15 +136,20 @@ def _uninstall_windows():
     from platform_support import autostart
     from platform_support.updater import WIN_SYSTEM_INSTALL, WIN_USER_INSTALL
 
-    # Autoarranque (elimina tanto HKLM como HKCU si existen)
+    root = _is_root()
+    if not _confirm(system_install=root):
+        return
+
+    # Autoarranque (elimina HKLM y HKCU)
     autostart.disable()
 
     # Configuración del usuario actual
     shutil.rmtree(config.CONFIG_DIR, ignore_errors=True)
 
-    # Determinar qué directorio de instalación eliminar
+    # Directorios a eliminar
+    candidates = ([WIN_SYSTEM_INSTALL] if root else []) + [WIN_USER_INSTALL]
     dirs_to_remove = []
-    for path in (WIN_SYSTEM_INSTALL, WIN_USER_INSTALL):
+    for path in candidates:
         d = os.path.dirname(path)
         if os.path.isfile(path) and d not in dirs_to_remove:
             dirs_to_remove.append(d)
@@ -117,14 +158,15 @@ def _uninstall_windows():
         _done()
         return
 
-    # No se puede borrar el .exe en ejecución en Windows → .bat con retardo
     bat_lines = ["@echo off", "ping -n 3 127.0.0.1 > nul"]
     for d in dirs_to_remove:
         bat_lines.append(f'rmdir /S /Q "{d}"')
     bat_lines.append('del "%~f0"')
 
-    bat_path = os.path.join(os.environ.get("TEMP", os.path.expanduser("~")),
-                            "uninstall_solicitudayuda.bat")
+    bat_path = os.path.join(
+        os.environ.get("TEMP", os.path.expanduser("~")),
+        "uninstall_solicitudayuda.bat",
+    )
     with open(bat_path, "w") as f:
         f.write("\n".join(bat_lines) + "\n")
 
@@ -132,7 +174,6 @@ def _uninstall_windows():
         ["cmd", "/c", bat_path],
         creationflags=0x08000000 | 0x00000008,  # CREATE_NO_WINDOW | DETACHED_PROCESS
     )
-
     _done()
 
 
@@ -140,27 +181,49 @@ def _uninstall_windows():
 
 def _uninstall_macos():
     from platform_support import autostart
+    from platform_support.installer import MACOS_APP, MACOS_PLIST
 
-    # LaunchAgent (no requiere sudo)
+    root = _is_root()
+    if not _confirm(system_install=root):
+        return
+
+    # LaunchAgent del usuario actual
     autostart.disable()
+
+    # LaunchAgent del sistema (solo si root)
+    if root:
+        try:
+            subprocess.run(["launchctl", "unload", MACOS_PLIST], check=False)
+            os.remove(MACOS_PLIST)
+        except (FileNotFoundError, PermissionError):
+            pass
 
     # Configuración del usuario actual
     shutil.rmtree(config.CONFIG_DIR, ignore_errors=True)
 
-    # Localizar el bundle .app subiendo desde sys.executable
-    bundle = os.path.realpath(sys.executable)
-    for _ in range(6):
-        if bundle.endswith(".app"):
-            break
-        bundle = os.path.dirname(bundle)
+    # Bundle .app
+    # Con root: eliminar /Applications/SolicitudAyuda.app directamente.
+    # Sin root: localizar el bundle desde sys.executable.
+    if root and os.path.isdir(MACOS_APP):
+        bundle = MACOS_APP
+    else:
+        bundle = os.path.realpath(sys.executable)
+        for _ in range(6):
+            if bundle.endswith(".app"):
+                break
+            bundle = os.path.dirname(bundle)
+        if not bundle.endswith(".app"):
+            bundle = None
 
-    if bundle.endswith(".app") and os.path.isdir(bundle):
+    if bundle and os.path.isdir(bundle):
         try:
             shutil.rmtree(bundle)
         except PermissionError:
             _error(
                 f"No se pudo eliminar {bundle}.\n\n"
-                "Elimínelo manualmente arrastrándolo a la Papelera."
+                "Ejecute como root:\n"
+                f"  sudo '{sys.executable}' --uninstall\n\n"
+                "O elimínelo manualmente arrastrándolo a la Papelera."
             )
             return
 
@@ -170,9 +233,6 @@ def _uninstall_macos():
 # ── punto de entrada ──────────────────────────────────────────────────────────
 
 def run():
-    if not _confirm():
-        return
-
     system = platform.system()
     if system == "Linux":
         _uninstall_linux()

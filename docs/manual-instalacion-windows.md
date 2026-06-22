@@ -32,23 +32,37 @@ El cliente **no requiere instalación**. Es un único ejecutable portátil.
 > El arranque automático de Windows usa siempre la ruta donde quedó instalada.
 > No es necesario mover el archivo manualmente.
 
-### Instalación compartida para todos los usuarios del equipo
+### Instalación del sistema para todos los usuarios
 
-Si un mismo equipo tiene varios usuarios y todos deben tener acceso a la aplicación,
-el administrador puede instalarla en la ruta del sistema ejecutando **una sola vez**
-`SolicitudAyuda.exe` como administrador (clic derecho → «Ejecutar como administrador»).
-
-Alternativamente, puede copiarla manualmente con permisos elevados:
+Si el equipo tiene varios usuarios y todos deben tener acceso a la aplicación,
+use el instalador integrado. Haga **clic derecho → Ejecutar como administrador** sobre
+`SolicitudAyuda.exe` y a continuación ejecute en la ventana de comandos:
 
 ```
-mkdir "C:\ProgramData\SolicitudAyuda"
-copy SolicitudAyuda.exe "C:\ProgramData\SolicitudAyuda\SolicitudAyuda.exe"
+SolicitudAyuda.exe --install
 ```
 
-Cada usuario deberá ejecutar la aplicación una vez para que se configure su propio
-arranque automático y sus ajustes de ubicación. Las actualizaciones automáticas quedan
-deshabilitadas en instalaciones del sistema; el administrador las gestiona repitiendo
-la copia con la nueva versión.
+O con la ruta completa si hace falta:
+
+```
+"C:\Descargas\SolicitudAyuda.exe" --install
+```
+
+Aparecerá una ventana de confirmación. Al aceptar, el instalador:
+
+- Copia el ejecutable a `C:\ProgramData\SolicitudAyuda\SolicitudAyuda.exe`
+- Registra la entrada de autoarranque en `HKEY_LOCAL_MACHINE\...\Run`, lo que hace
+  que la aplicación arranque para **todos** los usuarios presentes y futuros
+
+Cada usuario verá la ventana de configuración de ubicación la primera vez que inicie
+sesión. Sus datos se guardan en su propio perfil (`%APPDATA%\HelpRequest\`).
+
+Las actualizaciones automáticas quedan deshabilitadas en instalaciones del sistema.
+Para actualizar, el administrador vuelve a ejecutar el instalador:
+
+```
+"C:\Descargas\SolicitudAyuda-nueva.exe" --install
+```
 
 ### Aviso de Windows SmartScreen
 
@@ -127,13 +141,16 @@ La forma más sencilla es usar el desinstalador integrado:
    ```
 3. Confirme en la ventana que aparece. El desinstalador eliminará:
    - El ejecutable y su directorio (`C:\ProgramData\SolicitudAyuda\` o `%LOCALAPPDATA%\SolicitudAyuda\`)
-   - La entrada de arranque automático del registro de Windows
+   - La entrada de arranque automático del registro (`HKLM` si se ejecuta como
+     Administrador, `HKCU` si se ejecuta como usuario normal)
    - Los datos de configuración del usuario actual (`%APPDATA%\HelpRequest\`)
 
-> En una instalación del sistema (`C:\ProgramData\`), cada usuario que haya
-> iniciado sesión tendrá su propia carpeta de configuración en `%APPDATA%\HelpRequest\`.
-> El desinstalador solo elimina la del usuario que lo ejecuta. Para limpiarlas todas,
-> elimine esa carpeta manualmente en cada perfil de usuario.
+> En una instalación del sistema (`C:\ProgramData\`), ejecute el desinstalador como
+> **Administrador** para eliminar también la entrada `HKLM` y el ejecutable compartido.
+>
+> Cada usuario que haya iniciado sesión tiene su propia carpeta de configuración en
+> `%APPDATA%\HelpRequest\`. El desinstalador solo elimina la del usuario que lo ejecuta.
+> Para limpiarlas todas, elimine esa carpeta manualmente en cada perfil de usuario.
 
 ---
 
