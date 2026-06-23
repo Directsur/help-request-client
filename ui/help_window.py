@@ -91,6 +91,15 @@ Ubicación
   Los cuatro campos son obligatorios para poder enviar alertas.
   El botón «Confirmar ubicación» no se activa hasta que todos estén rellenos.
 
+Tipo de equipo
+  ☐  Equipo de seguridad/guardia — recibe todos los avisos del centro,
+     independientemente del grupo al que pertenezca.
+
+  ☐  Equipo portátil — la ventana de ubicación aparece en cada inicio de
+     sesión para que el usuario pueda actualizar su posición.
+     En equipos fijos, una vez configurada la ubicación, esta ventana solo
+     vuelve a aparecer automáticamente una vez al mes.
+
 Para omitir por ahora: cierre la ventana con la X y confirme el aviso.
 El equipo arrancará en modo solo-recepción (icono amarillo o gris).
 

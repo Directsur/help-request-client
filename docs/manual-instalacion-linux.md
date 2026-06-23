@@ -93,6 +93,12 @@ sudo ./SolicitudAyuda-nueva-version.AppImage --install
      selector siguiente se activará mostrando solo los elementos que le corresponden. Si
      algún elemento no aparece, pulse **[+]** para añadirlo.
    - Los cuatro campos de ubicación son obligatorios.
+   - **Equipo de seguridad** — active esta casilla si el equipo debe recibir
+     todos los avisos del centro independientemente del grupo.
+   - **Equipo portátil** — active esta casilla si el equipo se desplaza entre
+     ubicaciones. En portátiles, la ventana de ubicación aparece en cada inicio
+     de sesión. En equipos fijos, una vez configurada la ubicación, solo vuelve
+     a aparecer automáticamente una vez al mes.
 3. Pulse **Confirmar ubicación**. El icono aparece en la bandeja del sistema.
 
 La aplicación se configura automáticamente para **arrancar con la sesión de escritorio**:

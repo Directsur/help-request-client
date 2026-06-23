@@ -97,6 +97,12 @@ Al arrancar por primera vez:
      seleccione primero el centro y cada selector siguiente se activará mostrando solo los
      elementos que le corresponden. Si algún elemento no aparece en la lista, pulse **[+]**
      junto al campo para añadirlo.
+   - **Equipo de seguridad** — active esta casilla si el equipo debe recibir
+     todos los avisos del centro independientemente del grupo.
+   - **Equipo portátil** — active esta casilla si el equipo se desplaza entre
+     ubicaciones. En portátiles, la ventana de ubicación aparece en cada inicio
+     de sesión. En equipos fijos, una vez configurada la ubicación, solo vuelve
+     a aparecer automáticamente una vez al mes.
    - Los cuatro campos de ubicación son obligatorios antes de poder pulsar «Confirmar ubicación».
 3. Pulse **Confirmar ubicación**. La aplicación queda activa en la bandeja del sistema
    (junto al reloj, en la esquina inferior derecha).
