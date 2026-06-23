@@ -26,6 +26,7 @@ Este repositorio contiene el **cliente de escritorio** multiplataforma. El servi
 - **Auto-actualización** en Linux (AppImage) y Windows (.exe) — descarga e instala nuevas versiones en segundo plano
 - **Soporte Wayland** en Linux — registra atajos en GNOME y KDE automáticamente
 - **Notificación sonora** al recibir alertas
+- **Modo portátil** — los equipos portátiles piden confirmar la ubicación en cada inicio de sesión; los equipos fijos la solicitan solo una vez al mes tras la configuración inicial. Configurable desde el cliente y desde el panel web del servidor
 
 ---
 
@@ -51,6 +52,7 @@ Este repositorio contiene el **cliente de escritorio** multiplataforma. El servi
    - Seleccione Centro → Edificio → Planta → Sala (selects en cascada).
    - Si algún elemento no está en la lista, pulse **[+]** para añadirlo al servidor.
    - Los cuatro campos de ubicación son obligatorios para poder enviar alertas.
+   - **Equipo portátil** — active esta casilla si el equipo se desplaza entre ubicaciones. La ventana de ubicación aparecerá en cada inicio de sesión. En equipos fijos solo vuelve a aparecer una vez al mes.
 4. Pulse **Confirmar ubicación**. El icono queda en la bandeja del sistema.
 5. A partir de ese momento, pulse `Ctrl+F12` para enviar una alerta.
 
