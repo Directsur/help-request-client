@@ -109,6 +109,7 @@ def _on_server_found(server_ip: str):
     if result:
         _app_cfg["group_id"]    = result.get("group_id")
         _app_cfg["is_security"] = result.get("is_security", False)
+        _app_cfg["is_portable"] = result.get("is_portable", _app_cfg.get("is_portable", False))
         _app_cfg["peers"]       = result.get("peers", [])
         loc = result.get("location", {})
         if loc.get("room"):
