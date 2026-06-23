@@ -153,6 +153,13 @@ class SetupWindow:
                        variable=self.security_var,
                        font=font(9)).pack(anchor="w", padx=24, pady=(8, 0))
 
+        # ── Equipo portátil ──
+        self.portable_var = tk.BooleanVar(value=self.cfg.get("is_portable", False))
+        tk.Checkbutton(self.root,
+                       text="Este equipo es un portátil (pide confirmar ubicación en cada inicio de sesión)",
+                       variable=self.portable_var,
+                       font=font(9)).pack(anchor="w", padx=24, pady=(2, 0))
+
         # ── Atajo activo ──
         hotkey_display = self.cfg.get("hotkey_display", cfg.DEFAULT_HOTKEY_DISPLAY)
         hk_frame = tk.Frame(self.root, bg="#1a252f", pady=6)
@@ -474,6 +481,7 @@ class SetupWindow:
             "building":    building_name,
             "center":      center_name,
             "is_security": self.security_var.get(),
+            "is_portable": self.portable_var.get(),
             "server_url":  self.server_url_var.get().strip(),
         }
 

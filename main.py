@@ -11,6 +11,7 @@ import socket
 import sys
 import threading
 import time
+from datetime import datetime, timezone
 
 import config as cfg
 from core import alert, network
@@ -244,6 +245,25 @@ def _setup_wayland_shortcuts():
         root2.destroy()
 
 
+def _should_show_setup() -> bool:
+    """Devuelve True si hay que mostrar la ventana de configuración de ubicación."""
+    if not cfg.is_location_complete(_app_cfg):
+        return True
+    if _app_cfg.get("is_portable", False):
+        return True
+    # Equipos fijos: mostrar una vez al mes
+    last = _app_cfg.get("last_setup_shown")
+    if not last:
+        return True
+    try:
+        last_dt = datetime.fromisoformat(last)
+        if last_dt.tzinfo is None:
+            last_dt = last_dt.replace(tzinfo=timezone.utc)
+        return (datetime.now(timezone.utc) - last_dt).days >= 30
+    except ValueError:
+        return True
+
+
 def _handle_trigger_args() -> bool:
     """
     Si el proceso fue invocado con --trigger o --drill, reenvía el comando
@@ -303,7 +323,12 @@ def main():
     threading.Thread(target=_heartbeat_loop, daemon=True, name="heartbeat").start()
 
     # Ventana de configuración de ubicación
-    _open_setup()
+    if _should_show_setup():
+        _open_setup()
+        # Equipos fijos: registrar cuándo se mostró para aplicar el intervalo mensual
+        if not _app_cfg.get("is_portable", False):
+            _app_cfg["last_setup_shown"] = datetime.now(timezone.utc).isoformat()
+            cfg.save(_app_cfg)
 
     # En Wayland, ofrece configurar atajos en el entorno de ventanas
     if _is_wayland():

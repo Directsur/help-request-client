@@ -32,19 +32,21 @@ def _get_mac() -> str:
 
 
 _DEFAULTS = {
-    "client_id":      _get_mac(),
-    "server_ip":      None,
-    "server_url":     "",   # URL manual (vacío = descubrimiento automático por UDP)
-    "room_id":        None,
-    "room":           "",
-    "floor":          "",
-    "building":       "",
-    "center":         "",
-    "group_id":       None,
-    "is_security":    False,
-    "hotkey":         DEFAULT_HOTKEY,
-    "hotkey_display": DEFAULT_HOTKEY_DISPLAY,
-    "peers":          [],
+    "client_id":        _get_mac(),
+    "server_ip":        None,
+    "server_url":       "",   # URL manual (vacío = descubrimiento automático por UDP)
+    "room_id":          None,
+    "room":             "",
+    "floor":            "",
+    "building":         "",
+    "center":           "",
+    "group_id":         None,
+    "is_security":      False,
+    "is_portable":      False,
+    "last_setup_shown": None,  # ISO-8601 UTC; None = nunca mostrado
+    "hotkey":           DEFAULT_HOTKEY,
+    "hotkey_display":   DEFAULT_HOTKEY_DISPLAY,
+    "peers":            [],
 }
 
 
