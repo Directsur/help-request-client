@@ -485,8 +485,11 @@ class SetupWindow:
             "server_url":  self.server_url_var.get().strip(),
         }
 
-        if self.server_ip and room:
-            network.update_location(self.server_ip, self.cfg["client_id"], room["id"])
+        if self.server_ip:
+            if room:
+                network.update_location(self.server_ip, self.cfg["client_id"], room["id"])
+            network.set_portable(self.server_ip, self.cfg["client_id"],
+                                 self.portable_var.get())
 
         self.root.destroy()
         self.on_confirm(updates)

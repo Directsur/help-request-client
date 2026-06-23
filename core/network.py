@@ -79,6 +79,17 @@ def update_location(server_ip: str, client_id: str, room_id: int) -> bool:
         return False
 
 
+def set_portable(server_ip: str, client_id: str, is_portable: bool) -> bool:
+    try:
+        r = _SESSION.put(
+            f"{_api(server_ip)}/api/clients/{client_id}/portable",
+            json={"is_portable": is_portable},
+        )
+        return r.ok
+    except Exception:
+        return False
+
+
 # ─── Dropdowns para ventana de configuración ──────────────────────────────────
 
 def get_centers(server_ip: str) -> list:
